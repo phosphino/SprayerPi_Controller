@@ -33,6 +33,8 @@ class mainwindow(Ui_MainWindow):
 		#Quadrant 1: matplotlib widget and object
 		self.mpl_widget = QtWidgets.QWidget()
 		self.mpl = MplCanvas(self.mpl_widget)
+		self.mpl_widget.resize(400,800)
+		self.mpl_widget.setMinimumHeight(self.mpl_widget.frameGeometry().height()/2)
 
 		#Quadrant 2: spray options
 		self.spray_options_box = QtWidgets.QGroupBox("Spray Options")
