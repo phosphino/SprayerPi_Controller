@@ -9,7 +9,7 @@ class MplCanvas(FigureCanvas):
 		self.axes = fig.add_subplot(111)
 
 		fig.patch.set_facecolor('#f0f0f0')
-
+		fig.subplots_adjust(left= 0.2, right = 0.9, bottom = 0.175, top = 0.9)
 		FigureCanvas.__init__(self, fig)
 		self.setParent(parent)
 
@@ -18,6 +18,8 @@ class MplCanvas(FigureCanvas):
 								   QtWidgets.QSizePolicy.Expanding,
 								   QtWidgets.QSizePolicy.Expanding)
 		FigureCanvas.updateGeometry(self)
+
+
 
 	def update_figure(self, x, y):
 		slabel = 'time / sec'
