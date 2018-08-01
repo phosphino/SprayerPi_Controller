@@ -12,7 +12,7 @@ class mainwindow(Ui_MainWindow):
 		self.setupUi(mainwindow)
 		
 		#GPIO setup
-		GPIO.setmode(GPIO.BOARD)		
+		GPIO.setmode(GPIO.BOARD)#Using Physical Pin Numbers		
 		GPIO.setwarnings(False)
 		
 		#Timer setup
@@ -25,8 +25,8 @@ class mainwindow(Ui_MainWindow):
 		self.temp = [self.thermocouple.temp()]
 				
 		#GPIO setup: Hotplate
-		self.hotplate = 8 #hotplate relay is connected to pin #8 
-		GPIO.setup(self.hotplate, GPIO.OUT, initial=GPIO.LOW)
+		self.gpio_hotplate = 8 #hotplate relay is connected to pin #8 
+		GPIO.setup(self.gpio_hotplate, GPIO.OUT, initial=GPIO.LOW)
 		
 
 		self.target_temp_edit = QtWidgets.QLineEdit()
@@ -55,8 +55,7 @@ class mainwindow(Ui_MainWindow):
 		#Quadrant 1: matplotlib widget and object
 		self.mpl_widget = QtWidgets.QWidget()
 		self.mpl = MplCanvas(self.mpl_widget)
-		self.mpl_widget.resize(400,800)
-		self.mpl_widget.setMinimumHeight(self.mpl_widget.frameGeometry().height()/2)
+		self.mpl_widget.setMinimumHeight(380)
 
 		#Quadrant 2: spray options
 		self.spray_options_box = QtWidgets.QGroupBox("Spray Options")
@@ -67,6 +66,7 @@ class mainwindow(Ui_MainWindow):
 		self.spray_options_box.setLayout(self.spray_options_layout)
 
 		#Quadrant 3: spray_control
+		self.spray_control_box = QtWidgets.QGroupBox("Spray Control")
 		self.spray_control_layout = QtWidgets.QVBoxLayout()
 
 		#Quadrant 4: spray_progress
@@ -75,8 +75,8 @@ class mainwindow(Ui_MainWindow):
 
 		#Setup Layout
 		self.main_grid = QtWidgets.QGridLayout(self.centralwidget)
-		self.main_grid.addWidget(self.mpl_widget, 0, 0)
-		self.main_grid.addWidget(self.spray_options_box, 1, 0)
+		self.main_grid.addWidget(self.mpl_widget, 0, 1)
+		self.main_grid.addWidget(self.spray_options_box, 0, 0)
 		
 		#Connect QTimer for Updating
 		self.timer.timeout.connect(self.update_temperature)
@@ -84,10 +84,10 @@ class mainwindow(Ui_MainWindow):
 		
 		
 	def heat_on(self):
-		GPIO.output(self.hotplate, GPIO.HIGH)
+		GPIO.output(self.gpio_hotplate, GPIO.HIGH)
 	
 	def heat_off(self):
-		GPIO.output(self.hotplate, GPIO.LOW)
+		GPIO.output(self.gpio_hotplate, GPIO.LOW)
 	
 		
 	def update_temperature(self):
