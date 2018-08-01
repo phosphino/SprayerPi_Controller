@@ -3,12 +3,31 @@ from sprayUI import Ui_MainWindow
 from PyQt5 import QtCore, QtWidgets, QtGui
 import numpy as np
 from pyqtMpl import *
-
+from pyqtTemp import *
+import RPi.GPIO as GPIO
 
 class mainwindow(Ui_MainWindow):
 	def __init__(self, mainwindow):
 		Ui_MainWindow.__init__(self)
 		self.setupUi(mainwindow)
+		
+		#GPIO setup
+		GPIO.setmode(GPIO.BOARD)		
+		GPIO.setwarnings(False)
+		
+		#Timer setup
+		self.timer = QtCore.QTimer()
+		self.interval = 1500
+		
+		#Thermocouple setup
+		self.thermocouple = adatemp()
+		self.time = [0]
+		self.temp = [self.thermocouple.temp()]
+				
+		#GPIO setup: Hotplate
+		self.hotplate = 8 #hotplate relay is connected to pin #8 
+		GPIO.setup(self.hotplate, GPIO.OUT, initial=GPIO.LOW)
+		
 
 		self.target_temp_edit = QtWidgets.QLineEdit()
 		self.target_temp_label = QtWidgets.QLabel("Target T (Celsius)")
@@ -28,6 +47,9 @@ class mainwindow(Ui_MainWindow):
 		self.on_button = QtWidgets.QPushButton("ON")
 		self.off_button = QtWidgets.QPushButton("OFF")
 		self.current_temp = QtWidgets.QLCDNumber()
+		
+		self.on_button.clicked.connect(self.heat_on)
+		self.off_button.clicked.connect(self.heat_off)
 
 
 		#Quadrant 1: matplotlib widget and object
@@ -55,6 +77,26 @@ class mainwindow(Ui_MainWindow):
 		self.main_grid = QtWidgets.QGridLayout(self.centralwidget)
 		self.main_grid.addWidget(self.mpl_widget, 0, 0)
 		self.main_grid.addWidget(self.spray_options_box, 1, 0)
+		
+		#Connect QTimer for Updating
+		self.timer.timeout.connect(self.update_temperature)
+		self.timer.start(self.interval)
+		
+		
+	def heat_on(self):
+		GPIO.output(self.hotplate, GPIO.HIGH)
+	
+	def heat_off(self):
+		GPIO.output(self.hotplate, GPIO.LOW)
+	
+		
+	def update_temperature(self):
+		temp = self.thermocouple.temp()
+		self.current_temp.display(float(temp))
+		self.time.append(self.time[-1]+(self.interval/1000.0))
+		self.temp.append(temp)
+		self.mpl.update_figure(self.time,self.temp)
+		
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)

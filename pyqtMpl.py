@@ -29,10 +29,10 @@ class MplCanvas(FigureCanvas):
 		if x[-1] < 60:
 			self.axes.set_xlabel(slabel)
 		if x[-1] >= 60 and x[-1] < 3600:
-			x = x/60
+			x = [i/60.0 for i in x]
 			self.axes.set_xlabel(mlabel)
 		if x[-1] >= 3600:
-			x = x/3600
+			x = [i/3600.0 for i in x]
 			self.axes.set_xlabel(hlabel)
 		self.axes.set_ylabel('temperature / Celsius')
 
