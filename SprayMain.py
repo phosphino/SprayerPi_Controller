@@ -27,30 +27,6 @@ class mainwindow(Ui_MainWindow):
 		#GPIO setup: Hotplate
 		self.gpio_hotplate = 8 #hotplate relay is connected to pin #8 
 		GPIO.setup(self.gpio_hotplate, GPIO.OUT, initial=GPIO.LOW)
-		
-
-		self.target_temp_edit = QtWidgets.QLineEdit()
-		self.target_temp_label = QtWidgets.QLabel("Target T (Celsius)")
-
-		self.number_of_sprays = QtWidgets.QLineEdit()
-		self.number_of_sprays_label = QtWidgets.QLabel("# of Sprays")
-
-		self.heating_boolean = False
-		self.heating_on_label = "Heater On"
-		self.heating_off_label = "Heater Off"
-
-		self.spray_boolean = False
-		self.spray_on_label = "Spray On"
-		self.spray_off_label = "Spray Off"
-
-		#Hotplate Control
-		self.on_button = QtWidgets.QPushButton("ON")
-		self.off_button = QtWidgets.QPushButton("OFF")
-		self.current_temp = QtWidgets.QLCDNumber()
-		
-		self.on_button.clicked.connect(self.heat_on)
-		self.off_button.clicked.connect(self.heat_off)
-
 
 		#Quadrant 1: matplotlib widget and object
 		self.mpl_widget = QtWidgets.QWidget()
@@ -58,12 +34,48 @@ class mainwindow(Ui_MainWindow):
 		self.mpl_widget.setMinimumHeight(380)
 
 		#Quadrant 2: spray options
+		sprayoptions = []
 		self.spray_options_box = QtWidgets.QGroupBox("Spray Options")
 		self.spray_options_layout = QtWidgets.QVBoxLayout()
-		self.spray_options_layout.addWidget(self.on_button)
-		self.spray_options_layout.addWidget(self.off_button)
-		self.spray_options_layout.addWidget(self.current_temp)
+		
+		self.set_temp_label = QtWidgets.QLabel("Set Point (Celsius): ")
+		self.set_temp_edit = QtWidgets.QLineEdit()
+		sprayoptions.append([self.set_temp_label, self.set_temp_edit])
+		
+		self.set_spray_label = QtWidgets.QLabel("Number of sprays: ")
+		self.set_spray_edit = QtWidgets.QLineEdit()
+		sprayoptions.append([self.set_spray_label, self.set_spray_edit])
+		
+		self.set_sprayspeed_label = QtWidgets.QLabel("Set Move Speed")
+		self.set_sprayspeed_edit = QtWidgets.QLineEdit()
+		sprayoptions.append([self.set_sprayspeed_label, self.set_sprayspeed_edit])
+		
+		self.set_spraypause_label = QtWidgets.QLabel("Set pause time (sec)")
+		self.set_spraypause_edit = QtWidgets.QLineEdit()
+		sprayoptions.append([self.set_spraypause_label, self.set_spraypause_edit])
+		
+		self.heating_status = QtWidgets.QLabel("Heating Off")
+		sprayoptions.append([self.heating_status])
+		
+		self.spraying_status = QtWidgets.QLabel("Spraying Off")
+		sprayoptions.append([self.spraying_status])
+		
+		self.loaded_profile_label = QtWidgets.QLabel("Loaded Profile: ")
+		self.loaded_profile_edit = QtWidgets.QLabel()
+		sprayoptions.append([self.loaded_profile_label, self.loaded_profile_edit])
+		
+		#for loop for putting elements in hbox and adding to vbox
+		for x in sprayoptions:
+			hbox = QtWidgets.QHBoxLayout()
+			for i in x:
+				hbox.addWidget(i)
+			self.spray_options_layout.addLayout(hbox)	
+		
 		self.spray_options_box.setLayout(self.spray_options_layout)
+		self.spray_options_box.resize(300,300)
+		self.spray_options_box.setMaximumWidth(300)
+		
+		self.spray_options_box.setMaximumHeight(250)
 
 		#Quadrant 3: spray_control
 		self.spray_control_box = QtWidgets.QGroupBox("Spray Control")
@@ -83,6 +95,7 @@ class mainwindow(Ui_MainWindow):
 		self.timer.start(self.interval)
 		
 		
+		
 	def heat_on(self):
 		GPIO.output(self.gpio_hotplate, GPIO.HIGH)
 	
@@ -92,7 +105,6 @@ class mainwindow(Ui_MainWindow):
 		
 	def update_temperature(self):
 		temp = self.thermocouple.temp()
-		self.current_temp.display(float(temp))
 		self.time.append(self.time[-1]+(self.interval/1000.0))
 		self.temp.append(temp)
 		self.mpl.update_figure(self.time,self.temp)

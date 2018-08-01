@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'sprayUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.5.1
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -16,12 +16,21 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1002, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1002, 26))
         self.menubar.setObjectName("menubar")
+        self.menuFile = QtWidgets.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.actionLoad_Profile = QtWidgets.QAction(MainWindow)
+        self.actionLoad_Profile.setObjectName("actionLoad_Profile")
+        self.actionSave_Profile = QtWidgets.QAction(MainWindow)
+        self.actionSave_Profile.setObjectName("actionSave_Profile")
+        self.menuFile.addAction(self.actionLoad_Profile)
+        self.menuFile.addAction(self.actionSave_Profile)
+        self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -29,6 +38,9 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.actionLoad_Profile.setText(_translate("MainWindow", "Load Profile"))
+        self.actionSave_Profile.setText(_translate("MainWindow", "Save Profile"))
 
 
 if __name__ == "__main__":
