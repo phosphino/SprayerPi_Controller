@@ -31,9 +31,26 @@ class mainwindow(Ui_MainWindow):
 		GPIO.setup(self.gpio_hotplate, GPIO.OUT, initial=GPIO.LOW)
 
 		#Quadrant 1: matplotlib widget and object
+		self.mpl_box = QtWidgets.QGroupBox("Temperature")
+		self.mpl_layout = QtWidgets.QVBoxLayout()
+		
+		self.temp_lcd = QtWidgets.QLCDNumber()
+		self.temp_lcd_label = QtWidgets.QLabel("Current Temperature (Celsius)")
+		self.temp_lcd.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
+		
+		hbox = QtWidgets.QHBoxLayout()
+		hbox.addWidget(self.temp_lcd_label)
+		hbox.addWidget(self.temp_lcd)
+		
 		self.mpl_widget = QtWidgets.QWidget()
 		self.mpl = MplCanvas(self.mpl_widget)
 		self.mpl_widget.setMinimumHeight(380)
+		
+		self.mpl_layout.addWidget(self.mpl)
+		self.mpl_layout.addLayout(hbox)
+		self.mpl_box.setLayout(self.mpl_layout)
+		
+		self.temp_lcd.resize(3, self.temp_lcd.height())
 
 		#Quadrant 2: spray options
 		sprayoptions = []
@@ -108,9 +125,9 @@ class mainwindow(Ui_MainWindow):
 
 		#Setup Layout
 		self.main_grid = QtWidgets.QGridLayout(self.centralwidget)
-		self.main_grid.addWidget(self.mpl_widget, 0, 1)
+		self.main_grid.addWidget(self.mpl_box, 0, 1)
 		self.main_grid.addWidget(self.spray_options_box, 0, 0)
-		self.main_grid.addWidget(self.spray_control_box,1,1)
+		self.main_grid.addWidget(self.spray_control_box,1, 0, 1, 1)
 		
 		#Connect QTimer for Updating
 		self.timer.timeout.connect(self.update_temperature)
@@ -138,6 +155,7 @@ class mainwindow(Ui_MainWindow):
 		self.time.append(self.time[-1]+(self.interval/1000.0))
 		self.temp.append(temp)
 		self.mpl.update_figure(self.time,self.temp)
+		self.temp_lcd.display(temp)
 		if self.run_boolean == True:
 			self.heater_control(temp)
 			
