@@ -58,9 +58,28 @@ class mainwindow(Ui_MainWindow):
 		self.set_spraypause_label = QtWidgets.QLabel("Pause time (sec): ")
 		self.set_spraypause_edit = QtWidgets.QLineEdit()
 		sprayoptions.append([self.set_spraypause_label, self.set_spraypause_edit])
+
+		self.spray_choice_box = QtWidgets.QGroupBox("Select Spray Mode")
+		hbox = QtWidgets.QHBoxLayout()
+		self.pneumatic_selection = QtWidgets.QRadioButton("Pneumatic")
+		self.pneumatic_selection.setChecked(False)
+		self.ultrasonic_selection = QtWidgets.QRadioButton("Ultrasonic")
+		self.ultrasonic_selection.setChecked(True)
+		hbox.addWidget(self.pneumatic_selection)
+		hbox.addWidget(self.ultrasonic_selection)
+		self.spray_choice_box.setLayout(hbox)
+		self.spray_choice_box.setMaximumHeight(50)
+		sprayoptions.append([self.spray_choice_box])
+
 		
 		self.loaded_profile_label = QtWidgets.QLabel("Loaded Profile: ")
 		self.loaded_profile_edit = QtWidgets.QLabel()
+
+		self.loaded_profile_label.setMaximumHeight(60)
+		self.loaded_profile_edit.setMaximumHeight(60)
+
+		self.loaded_profile_label.setMinimumHeight(30)
+		self.loaded_profile_edit.setMinimumHeight(30)
 		sprayoptions.append([self.loaded_profile_label, self.loaded_profile_edit])
 		
 		#for loop for putting elements in hbox and adding to vbox
@@ -71,9 +90,8 @@ class mainwindow(Ui_MainWindow):
 			self.spray_options_layout.addLayout(hbox)	
 		
 		self.spray_options_box.setLayout(self.spray_options_layout)
-		self.spray_options_box.setMaximumWidth(300)
-		
-		self.spray_options_box.setMaximumHeight(200)
+
+
 
 		#Quadrant 3: spray_control
 		self.spray_control_box = QtWidgets.QGroupBox("Spray Control")
@@ -111,9 +129,16 @@ class mainwindow(Ui_MainWindow):
 
 		#Setup Layout
 		self.main_grid = QtWidgets.QGridLayout(self.centralwidget)
+		#Adjusting Box Dimensions
 		self.mpl_box.setMinimumHeight(50)
+		self.mpl_box.setMaximumHeight(300)
+		self.mpl_box.setMinimumWidth(400)
 		self.main_grid.addWidget(self.mpl_box, 0, 1)
+
 		self.main_grid.addWidget(self.spray_options_box, 0, 0)
+		self.spray_options_box.setMaximumWidth(300)
+		self.spray_options_box.setMinimumWidth(300)
+
 		self.main_grid.addWidget(self.spray_control_box,1, 0, 1, 1)
 		
 		#Connect QTimer for Updating
@@ -124,6 +149,7 @@ class mainwindow(Ui_MainWindow):
 		self.time.append(self.time[-1]+1)
 		self.temp.append(self.time[-1]*self.temp[-1])
 		self.mpl.update_figure(self.time, self.temp)
+		self.temp_lcd.display(self.temp[-1])
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
