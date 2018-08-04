@@ -4,31 +4,17 @@ from PyQt5 import QtCore, QtWidgets, QtGui
 import numpy as np
 from pyqtMpl import *
 from pyqtTemp import *
-import RPi.GPIO as GPIO
 
 class mainwindow(Ui_MainWindow):
 	def __init__(self, mainwindow):
 		Ui_MainWindow.__init__(self)
 		self.setupUi(mainwindow)
-		
-		#GPIO setup
-		GPIO.setmode(GPIO.BOARD)#Using Physical Pin Numbers		
-		GPIO.setwarnings(False)
-		
-		#Timer setup
-		self.timer = QtCore.QTimer()
+
 		self.interval = 1500
-		
-		#Thermocouple setup
-		self.thermocouple = adatemp()
+		self.timer = QtCore.QTimer()
+
 		self.time = [0]
-		self.temp = [self.thermocouple.temp()]
-		
-		self.run_boolean = False
-				
-		#GPIO setup: Hotplate
-		self.gpio_hotplate = 8 #hotplate relay is connected to pin #8 
-		GPIO.setup(self.gpio_hotplate, GPIO.OUT, initial=GPIO.LOW)
+		self.temp = [0.1]
 
 		#Quadrant 1: matplotlib widget and object
 		self.mpl_box = QtWidgets.QGroupBox("Temperature")
@@ -108,7 +94,7 @@ class mainwindow(Ui_MainWindow):
 		self.run_button = QtWidgets.QPushButton("&Run")
 		controloptions.append([self.run_button])
 		
-		self.stop_button = QtWidgets.QPushButton("Stop")
+		self.stop_button = QtWidgets.QPushButton("&Stop")
 		controloptions.append([self.stop_button])
 		
 		for x in controloptions:
@@ -125,44 +111,19 @@ class mainwindow(Ui_MainWindow):
 
 		#Setup Layout
 		self.main_grid = QtWidgets.QGridLayout(self.centralwidget)
+		self.mpl_box.setMinimumHeight(50)
 		self.main_grid.addWidget(self.mpl_box, 0, 1)
 		self.main_grid.addWidget(self.spray_options_box, 0, 0)
 		self.main_grid.addWidget(self.spray_control_box,1, 0, 1, 1)
 		
 		#Connect QTimer for Updating
-		self.timer.timeout.connect(self.update_temperature)
 		self.timer.start(self.interval)
-		
-		#self.run_button.clicked.connect(self.heat_to_setpoint)
-		#self.stop_button.clicked.connect(self.heat_off)
-				
-		
-		
-	def heat_on(self):
-		GPIO.output(self.gpio_hotplate, GPIO.HIGH)
-	
-	def heat_off(self):
-		GPIO.output(self.gpio_hotplate, GPIO.LOW)
-		
-	def heater_control(self, temp):
-		setpoint = float(self.set_temp_edit.text())
-		if temp < setpoint:
-			pass
-	
-		
-	def update_temperature(self):
-		temp = self.thermocouple.temp()
-		self.time.append(self.time[-1]+(self.interval/1000.0))
-		self.temp.append(temp)
-		self.mpl.update_figure(self.time,self.temp)
-		self.temp_lcd.display(temp)
-		if self.run_boolean == True:
-			self.heater_control(temp)
-			
-			
-	def closeEvent(self, event):
-		print("CLOSEING")
-		
+		self.timer.timeout.connect(self.update_plot)
+
+	def update_plot(self):
+		self.time.append(self.time[-1]+1)
+		self.temp.append(self.time[-1]*self.temp[-1])
+		self.mpl.update_figure(self.time, self.temp)
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
