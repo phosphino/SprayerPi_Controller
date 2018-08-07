@@ -11,13 +11,12 @@ class mainwindow(Ui_MainWindow):
 		Ui_MainWindow.__init__(self)
 		self.setupUi(mainwindow)
 		
+		self.timer = QtCore.QTimer()
+		self.interval = 1500
+		print (self.centralwidget.width())
 		#GPIO setup
 		GPIO.setmode(GPIO.BOARD)#Using Physical Pin Numbers		
 		GPIO.setwarnings(False)
-		
-		#Timer setup
-		self.timer = QtCore.QTimer()
-		self.interval = 1500
 		
 		#Thermocouple setup
 		self.thermocouple = adatemp()
@@ -30,7 +29,7 @@ class mainwindow(Ui_MainWindow):
 		self.gpio_hotplate = 8 #hotplate relay is connected to pin #8 
 		GPIO.setup(self.gpio_hotplate, GPIO.OUT, initial=GPIO.LOW)
 
-		#Quadrant 1: matplotlib widget and object
+		#Top Half: matplotlib widget and object
 		self.mpl_box = QtWidgets.QGroupBox("Temperature")
 		self.mpl_layout = QtWidgets.QVBoxLayout()
 		
@@ -52,7 +51,7 @@ class mainwindow(Ui_MainWindow):
 		
 		self.temp_lcd.resize(3, self.temp_lcd.height())
 
-		#Quadrant 2: spray options
+		#Bottom Half: spray options
 		sprayoptions = []
 		self.spray_options_box = QtWidgets.QGroupBox("Spray Options")
 		self.spray_options_layout = QtWidgets.QVBoxLayout()
@@ -89,45 +88,10 @@ class mainwindow(Ui_MainWindow):
 		
 		self.spray_options_box.setMaximumHeight(200)
 
-		#Quadrant 3: spray_control
-		self.spray_control_box = QtWidgets.QGroupBox("Spray Control")
-		self.spray_control_layout = QtWidgets.QVBoxLayout()
-		
-		controloptions = []
-		
-		self.heating_status = QtWidgets.QLabel("Heating Off")
-		controloptions.append([self.heating_status])		
-		
-		self.spraying_status = QtWidgets.QLabel("Spraying Off")
-		controloptions.append([self.spraying_status])
-		
-		self.spray_number_label = QtWidgets.QLabel("Spray Number: ")
-		self.spray_number = QtWidgets.QLabel("0/0")		
-		controloptions.append([self.spray_number_label, self.spray_number])
-		
-		self.run_button = QtWidgets.QPushButton("&Run")
-		controloptions.append([self.run_button])
-		
-		self.stop_button = QtWidgets.QPushButton("Stop")
-		controloptions.append([self.stop_button])
-		
-		for x in controloptions:
-			hbox = QtWidgets.QHBoxLayout()
-			for i in x:
-				hbox.addWidget(i)
-			self.spray_control_layout.addLayout(hbox)
-		
-		self.spray_control_box.setLayout(self.spray_control_layout)
-
-		#Quadrant 4: spray_progress
-		self.spray_progress_layout = QtWidgets.QVBoxLayout()
-
-
 		#Setup Layout
 		self.main_grid = QtWidgets.QGridLayout(self.centralwidget)
-		self.main_grid.addWidget(self.mpl_box, 0, 1)
-		self.main_grid.addWidget(self.spray_options_box, 0, 0)
-		self.main_grid.addWidget(self.spray_control_box,1, 0, 1, 1)
+		self.main_grid.addWidget(self.mpl_box, 0, 0)
+		self.main_grid.addWidget(self.spray_options_box, 1, 0)
 		
 		#Connect QTimer for Updating
 		self.timer.timeout.connect(self.update_temperature)
@@ -169,7 +133,8 @@ if __name__ == '__main__':
 	window = QtWidgets.QMainWindow()
 
 	program = mainwindow(window)
+	
 
-	window.show()
+	window.showMaximized()
 	sys.exit(app.exec_())
 	
