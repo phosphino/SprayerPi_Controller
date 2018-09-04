@@ -3,8 +3,7 @@ from sprayUI import Ui_MainWindow
 from PyQt5 import QtCore, QtWidgets, QtGui
 import numpy as np
 from pyqtMpl import *
-from pyqtTemp import *
-import RPi.GPIO as GPIO
+#from pyqtTemp import *
 from UI_Setup import UI_Setup
 
 class mainwindow(Ui_MainWindow):
@@ -13,7 +12,11 @@ class mainwindow(Ui_MainWindow):
 		self.setupUi(mainwindow)
 		self.UI = UI_Setup()
 		self.UI.setup_mainscreen(self.centralwidget)
-		print(self.UI.mpl)
+
+		x = np.linspace(0,10,1000)
+		y = np.sin(x)
+		self.UI.mpl.update_figure(x,y)
+
 		
 
 if __name__ == '__main__':

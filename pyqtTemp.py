@@ -11,4 +11,3 @@ class adatemp:
 	
 	def temp(self):
 		return self.sensor.read_temp_c()
-	
