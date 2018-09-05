@@ -1,3 +1,7 @@
+'''
+Andrew Breuhaus-Alvarez, 2018
+UI setup for the spray pyrolysis control software 
+'''
 from PyQt5 import QtCore, QtWidgets, QtGui
 from pyqtMpl import *
 
@@ -32,7 +36,7 @@ class UI_Setup(object):
 		self.spray_options_box = QtWidgets.QGroupBox("Spray Options")
 		self.spray_options_layout = QtWidgets.QGridLayout(self.spray_options_box)
 
-		self.mode_label = QtWidgets.QLabel("Mode Selected (Pneumatic or Ultrasonic): ")
+		self.mode_label = QtWidgets.QLabel("Mode Selected: ")
 		self.mode_selected_label = QtWidgets.QLabel('None Selected')
 		sprayoptions.append([self.mode_label, self.mode_selected_label])
 
@@ -55,9 +59,9 @@ class UI_Setup(object):
 		self.loaded_profile_label = QtWidgets.QLabel("Loaded Profile: ")
 		self.loaded_profile_edit = QtWidgets.QLabel()
 		sprayoptions.append([self.loaded_profile_label, self.loaded_profile_edit])
-
 		
-
+		self.run_button = QtWidgets.QPushButton("&RUN")
+		sprayoptions.append([self.run_button])
 
 		# for loop for putting elements in hbox and adding to vbox
 		j = 0
@@ -67,7 +71,6 @@ class UI_Setup(object):
 			for x in sprayoptions[z]:
 				hbox.addWidget(x)
 			self.spray_options_layout.addLayout(hbox, j, i)
-			print(sprayoptions[0], j, i)
 			i = i+1
 			if i > 2:
 				i = 0
