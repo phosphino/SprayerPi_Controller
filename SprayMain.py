@@ -19,7 +19,7 @@ class mainwindow(Ui_MainWindow):
 		self.UI = UI_Setup()
 		self.UI.setup_mainscreen(self.centralwidget)
 		
-		self.run_button = self.UI.run_button
+		self.UI.run_button.clicked.connect
 
 		x = np.linspace(0,10,1000)
 		y = np.sin(x)
