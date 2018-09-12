@@ -18,11 +18,11 @@ class motorcontrol:
 		self.__current_dir = None
 		self.__current_set_speed = 0
 		
-		self.__go_sentinal = False		
+		self.__go_sentinal = False
+		self.__spray_sentinal = False		
 		self.__delay = 0.0005
 		self.__track_width = None
 		self.__inches_per_step = None
-		self.__spray_width = 2.5
 	
 		GPIO.setmode(GPIO.BOARD)
 	
@@ -35,13 +35,13 @@ class motorcontrol:
 		GPIO.add_event_detect(self.__back_switch, GPIO.FALLING, bouncetime = 60, callback = self.back_endstop)
 			
 		self.set_dir(self.__back_dir)	
-		self.initialize_track()	
+		#self.initialize_track()	
 		
 	def initialize_track(self):
 		self.set_microstepping(4)
 		self.calibrate_settings()
 		
-	def calibrate_settings(self, trials = 10):
+	def calibrate_settings(self, trials = 3):
 		factor = self.__current_microstep
 		self.go_to_endstop()
 		width = []
@@ -73,16 +73,18 @@ class motorcontrol:
 		half_width = int (self.__track_width / 2)
 		self.counted_steps(half_width)		
 	
-	def oscillate_current_position(self, width = 2.5, cycles = 10):
+	def spray_cycle_motor(self, width = 2.75, cycles = 200, spray_delay = 0):
 		total_steps = int( width / self.__inches_per_step )
 		half_steps = int(total_steps / 2)
 		self.set_dir(self.__back_dir)
+		self.counted_steps(half_steps)
+		self.reverse_dir()
 		for i in range(cycles):
-			self.counted_steps(half_steps)
+			self.counted_steps(total_steps)
 			self.reverse_dir()
 			self.counted_steps(total_steps)
 			self.reverse_dir()
-			self.counted_steps(half_steps)
+			sleep(spray_delay)
 					
 	def set_spray_width(self, width):
 		self.__spray_width = width

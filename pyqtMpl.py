@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtWidgets
 
 class MplCanvas(FigureCanvas):
 	def __init__(self, parent = None, width = 6, height = 5, dpi = 82):
-		fig = Figure(figsize=(width, height), dpi = dpi)
+		fig = Figure(figsize=(width, height), dpi = dpi, tight_layout = True)
 		self.axes = fig.add_subplot(111)
 
 		fig.patch.set_facecolor('#f0f0f0')

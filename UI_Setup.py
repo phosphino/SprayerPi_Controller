@@ -48,20 +48,28 @@ class UI_Setup(object):
 		self.set_spray_edit = QtWidgets.QLineEdit()
 		sprayoptions.append([self.set_spray_label, self.set_spray_edit])
 
-		self.set_sprayspeed_label = QtWidgets.QLabel("Move Speed: ")
+		self.set_sprayspeed_label = QtWidgets.QLabel("Move Speed (inch/sec): ")
 		self.set_sprayspeed_edit = QtWidgets.QLineEdit()
 		sprayoptions.append([self.set_sprayspeed_label, self.set_sprayspeed_edit])
-
-		self.set_spraypause_label = QtWidgets.QLabel("Pause time (sec): ")
-		self.set_spraypause_edit = QtWidgets.QLineEdit()
-		sprayoptions.append([self.set_spraypause_label, self.set_spraypause_edit])
+		
+		self.set_spray_volume_label = QtWidgets.QLabel("Spray Volume (mL): ")
+		self.set_spray_volume_edit = QtWidgets.QLineEdit()
+		sprayoptions.append([self.set_spray_volume_label, self.set_spray_volume_edit])
+		
+		self.set_pause_label = QtWidgets.QLabel("Pause time (sec): ")
+		self.set_pause_edit = QtWidgets.QLineEdit()
+		sprayoptions.append([self.set_pause_label, self.set_pause_edit])
+		
+		self.set_spray_width_label = QtWidgets.QLabel("Spray Travel Distance (inches): ")
+		self.set_spray_width_edit = QtWidgets.QLineEdit()
+		sprayoptions.append([self.set_spray_width_label, self.set_spray_width_edit])
 
 		self.loaded_profile_label = QtWidgets.QLabel("Loaded Profile: ")
 		self.loaded_profile_edit = QtWidgets.QLabel()
 		sprayoptions.append([self.loaded_profile_label, self.loaded_profile_edit])
 		
-		self.run_button = QtWidgets.QPushButton("&RUN")
-		sprayoptions.append([self.run_button])
+		self.standby_button = QtWidgets.QPushButton("&Standby")
+		sprayoptions.append([self.standby_button])
 
 		# for loop for putting elements in hbox and adding to vbox
 		j = 0
