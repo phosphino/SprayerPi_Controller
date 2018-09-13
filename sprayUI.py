@@ -20,6 +20,8 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
+        self.menuSelect_Mode = QtWidgets.QMenu(self.menuFile)
+        self.menuSelect_Mode.setObjectName("menuSelect_Mode")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -28,19 +30,36 @@ class Ui_MainWindow(object):
         self.actionLoad_Profile.setObjectName("actionLoad_Profile")
         self.actionSave_Profile = QtWidgets.QAction(MainWindow)
         self.actionSave_Profile.setObjectName("actionSave_Profile")
+        self.actionPneumatic = QtWidgets.QAction(MainWindow)
+        self.actionPneumatic.setObjectName("actionPneumatic")
+        self.actionUltrasonic = QtWidgets.QAction(MainWindow)
+        self.actionUltrasonic.setObjectName("actionUltrasonic")
+        self.actionExit = QtWidgets.QAction(MainWindow)
+        self.actionExit.setObjectName("actionExit")
+        self.menuSelect_Mode.addAction(self.actionPneumatic)
+        self.menuSelect_Mode.addAction(self.actionUltrasonic)
         self.menuFile.addAction(self.actionLoad_Profile)
         self.menuFile.addAction(self.actionSave_Profile)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.menuSelect_Mode.menuAction())
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionExit)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
+        self.actionExit.triggered.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuSelect_Mode.setTitle(_translate("MainWindow", "Select Mode"))
         self.actionLoad_Profile.setText(_translate("MainWindow", "Load Profile"))
         self.actionSave_Profile.setText(_translate("MainWindow", "Save Profile"))
+        self.actionPneumatic.setText(_translate("MainWindow", "Pneumatic"))
+        self.actionUltrasonic.setText(_translate("MainWindow", "Ultrasonic"))
+        self.actionExit.setText(_translate("MainWindow", "Exit"))
 
 
 if __name__ == "__main__":
