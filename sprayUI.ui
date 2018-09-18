@@ -37,6 +37,7 @@
     <addaction name="actionLoad_Profile"/>
     <addaction name="actionSave_Profile"/>
     <addaction name="separator"/>
+    <addaction name="actionSettings"/>
     <addaction name="menuSelect_Mode"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
@@ -67,6 +68,11 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

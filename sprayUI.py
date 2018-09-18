@@ -36,11 +36,14 @@ class Ui_MainWindow(object):
         self.actionUltrasonic.setObjectName("actionUltrasonic")
         self.actionExit = QtWidgets.QAction(MainWindow)
         self.actionExit.setObjectName("actionExit")
+        self.actionSettings = QtWidgets.QAction(MainWindow)
+        self.actionSettings.setObjectName("actionSettings")
         self.menuSelect_Mode.addAction(self.actionPneumatic)
         self.menuSelect_Mode.addAction(self.actionUltrasonic)
         self.menuFile.addAction(self.actionLoad_Profile)
         self.menuFile.addAction(self.actionSave_Profile)
         self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionSettings)
         self.menuFile.addAction(self.menuSelect_Mode.menuAction())
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
@@ -60,6 +63,7 @@ class Ui_MainWindow(object):
         self.actionPneumatic.setText(_translate("MainWindow", "Pneumatic"))
         self.actionUltrasonic.setText(_translate("MainWindow", "Ultrasonic"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
+        self.actionSettings.setText(_translate("MainWindow", "Settings"))
 
 
 if __name__ == "__main__":

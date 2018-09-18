@@ -4,6 +4,7 @@ Model and Control code for Spray Pyrolysis Control Software
 '''
 import sys
 from sprayUI import Ui_MainWindow
+from settingsUI import Ui_MotorSettings
 from PyQt5 import QtCore, QtWidgets, QtGui
 from collections import OrderedDict
 import csv
@@ -61,18 +62,10 @@ class mainwindow(Ui_MainWindow):
 		self.set_temp_label = QtWidgets.QLabel("Set Point (Celsius): ")
 		self.set_temp_edit = QtWidgets.QLineEdit()
 		self.__sprayoptions.append([self.set_temp_label, self.set_temp_edit])
-
-		self.set_spray_label = QtWidgets.QLabel("Number of sprays: ")
-		self.set_spray_edit = QtWidgets.QLineEdit()
-		self.__sprayoptions.append([self.set_spray_label, self.set_spray_edit])
-
-		self.set_sprayspeed_label = QtWidgets.QLabel("Move Speed (inch/sec): ")
-		self.set_sprayspeed_edit = QtWidgets.QLineEdit()
-		self.__sprayoptions.append([self.set_sprayspeed_label, self.set_sprayspeed_edit])
 		
-		self.set_spray_volume_label = QtWidgets.QLabel("Spray Volume (mL): ")
-		self.set_spray_volume_edit = QtWidgets.QLineEdit()
-		self.__sprayoptions.append([self.set_spray_volume_label, self.set_spray_volume_edit])
+		self.set_volume_dispensing_label = QtWidgets.QLabel("Volume to dispense (mL): ")
+		self.set_volume_dispensing_edit = QtWidgets.QLineEdit()
+		self.__sprayoptions.append([self.set_volume_dispensing_label, self.set_volume_dispensing_edit])
 		
 		self.set_pause_label = QtWidgets.QLabel("Pause time (sec): ")
 		self.set_pause_edit = QtWidgets.QLineEdit()
@@ -125,6 +118,8 @@ class mainwindow(Ui_MainWindow):
 		
 		self.actionPneumatic.triggered.connect(self.set_pneumatic)
 		self.actionUltrasonic.triggered.connect(self.set_ultrasonic)
+		
+		self.actionSettings.triggered.connect(self.launch_settings)
 		
 		'''
 		End MenuBar Actions
@@ -179,6 +174,14 @@ class mainwindow(Ui_MainWindow):
 	def set_ultrasonic(self):
 		self.__spraymode_selected = self.__spraymodes[1]
 		self.__sprayoptions[0][1].setText(self.__spraymode_selected)
+		
+	def launch_settings(self):
+		settings_dialog = QtWidgets.QDialog()
+		dialog = Ui_MotorSettings()
+		dialog.setupUi(settings_dialog)
+		settings_dialog.exec_()
+		settings_dialog.show()
+		
 		
 	'''
 	END: MENUBAR FUNCTIONS
