@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Spray Pyrolysis Control</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>cropped-fav_icon-270x270.png</normaloff>cropped-fav_icon-270x270.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">

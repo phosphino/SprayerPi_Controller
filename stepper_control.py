@@ -13,7 +13,6 @@ microstepping = (18,16,12)#Board numbers for microstepping pins
 front_dir = 1
 back_dir = 0	
 microstep_map = {1: (0,0,0), 2: (1,0,0), 4 : (0,1,0), 8:(1,1,0), 16:(0,0,1), 32: (0,1,1)}
-microstep_keys = [1, 2, 4, 8, 16, 32]
 
 class motorcontrol:
 	def __init__(self):

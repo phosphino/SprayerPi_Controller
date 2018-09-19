@@ -12,6 +12,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1002, 661)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("cropped-fav_icon-270x270.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -55,7 +58,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Spray Pyrolysis Control"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuSelect_Mode.setTitle(_translate("MainWindow", "Select Mode"))
         self.actionLoad_Profile.setText(_translate("MainWindow", "Load Profile"))
