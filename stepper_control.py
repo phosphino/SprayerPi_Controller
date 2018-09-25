@@ -6,6 +6,7 @@ import statistics as st
 #BOARD PIN #'S FOR RPI 3
 DIR = 38
 STEP = 40
+ENABLE = 33
 front_switch = 36
 back_switch = 32
 microstepping = (18,16,12)#Board numbers for microstepping pins
@@ -29,7 +30,7 @@ class motorcontrol:
 		GPIO.setwarnings(False)
 		GPIO.setmode(GPIO.BOARD)
 	
-		GPIO.setup([STEP, DIR], GPIO.OUT)
+		GPIO.setup([STEP, DIR, ENABLE], GPIO.OUT)
 		GPIO.setup([front_switch, back_switch], GPIO.IN, pull_up_down = GPIO.PUD_UP)
 		GPIO.setup(microstepping, GPIO.OUT)
 		
@@ -42,6 +43,7 @@ class motorcontrol:
 		
 	def initialize_track(self):
 		self.set_microstepping(4)
+		GPIO.output(ENABLE, 1)
 		#self.calibrate_settings()
 		
 	def calibrate_settings(self, trials = 3):
