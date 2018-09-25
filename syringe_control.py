@@ -1,3 +1,13 @@
+'''
+Andrew Breuhaus-Alvarez, September 2018
+Bartlett Lab
+python3
+class for controlling New-Era NE-1000 syringe pump. 
+baudrate must match baudrate set on syringe pump. default 19200
+Design influenced by Will Dickinson's control class
+https://bitbucket.org/iorodeo/syringe_pump/overview
+'''
+
 import time
 import serial
 import sys
@@ -30,10 +40,6 @@ class syringecontrol(serial.Serial):
 							'milliL/min' : 'MM*',
 							'microL/hr' : 'UH*',
 							'milliL/hr' : 'MH*'
-								}
-		self.__volunits = {
-							'microL' : 'UL',
-							'milliL' : 'ML'
 								}
 		
 		self.__rsp = None
@@ -92,19 +98,34 @@ class syringecontrol(serial.Serial):
 		response = float(response)
 		return response
 		
+	#SET DISPENSING RATE
+	def set_rate(self, rate, units = 'milliL/min'):
+		command = 'RAT'+self.formatfloat(rate)+self.__rateunits[units]
+		print('rate entered: '+command)
+		response = self.write_command(command)
+		if '?' in response:
+			raise Exception('Rate OOR for given units')
+		return response
 	
-	
+	def get_rate(self):
+		command = 'RAT'
+		response = self.write_command(command)
+		return response
+		
 	#SET VOLUME TO BE DISPENSED
 	def set_dispense_volume(self, vol, units='milliL'):
 		if units == 'milliL':
-			pass
+			command = 'VOLML'
+			response = self.write_command(command)
+			if '?' in response:
+				raise Exception('error in VOL mL unit change')
 		elif units == 'microL':
 			command = 'VOLUL'
 			response = self.write_command(command)
 			if '?' in response:
-				raise Exception('error in VOL unit change')
+				raise Exception('error in VOL uL unit change')
 		else:
-			raise ValueError('INCORRECT UNITS')
+			raise Exception('INCORRECT UNITS')
 		command = 'VOL'+self.formatfloat(vol)
 		response = self.write_command(command)
 		if '?' in response:

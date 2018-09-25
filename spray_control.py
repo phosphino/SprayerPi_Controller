@@ -3,6 +3,7 @@ from time import sleep
 from timeit import default_timer as timer
 import statistics as st
 from stepper_control import motorcontrol
+from syringe_control import syringecontrol
 
 gas_solenoid = 37
 ultrasonic_switch = 35
