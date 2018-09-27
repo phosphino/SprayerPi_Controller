@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
-    <height>362</height>
+    <width>351</width>
+    <height>156</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,8 +27,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>820</width>
-    <height>362</height>
+    <width>351</width>
+    <height>156</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -44,87 +44,13 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="7" column="1">
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="volume_edit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="setpoint_label">
-       <property name="text">
-        <string>Hotplate Setpoint (Celsius)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QRadioButton" name="ultrasonic_radio">
-       <property name="text">
-        <string>Ultrasonic</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">spraymode_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="6" column="2">
-      <widget class="QRadioButton" name="milliLmin_radio">
-       <property name="text">
-        <string>milliL/min</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">rate_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Pause Time (sec)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QRadioButton" name="pneumatic_radio">
-       <property name="text">
-        <string>Pneumatic</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">spraymode_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="volume_label">
-       <property name="text">
-        <string>Volume To Dispense</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="2">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>(200-500)</string>
+      <widget class="QLineEdit" name="delay_edit">
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>16777215</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -135,217 +61,63 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="maxwidth_Edit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="delay_Edit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="5">
-      <widget class="QRadioButton" name="sixteen_microstep">
-       <property name="text">
-        <string>1/16</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">microstepping_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QRadioButton" name="eight_microstep">
-       <property name="text">
-        <string>1/8</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">microstepping_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QRadioButton" name="one_microstep">
-       <property name="text">
-        <string>1/1</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <property name="autoRepeat">
-        <bool>false</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">microstepping_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="maxwidth_Label">
+      <widget class="QLabel" name="maxWidth_label">
        <property name="text">
         <string>Track Length (inches)</string>
        </property>
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="delay_Label">
+      <widget class="QLabel" name="delay_label">
        <property name="text">
         <string>Motor Delay (microsec)</string>
        </property>
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QRadioButton" name="two_microstep">
+      <widget class="QComboBox" name="microstepping_comboBox">
+       <item>
+        <property name="text">
+         <string>1/1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1/2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1/4</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1/8</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1/16</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1/32</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>1/2</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">microstepping_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QRadioButton" name="four_microstep">
-       <property name="text">
-        <string>1/4</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">microstepping_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="1" column="6">
-      <widget class="QRadioButton" name="thirtytwo_microstep">
-       <property name="text">
-        <string>1/32</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">microstepping_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QLineEdit" name="setpoint_edit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
+        <string>(200-500)</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="spraymode_label">
-       <property name="text">
-        <string>Spray Mode</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="3">
-      <widget class="QRadioButton" name="milliLhour_radio">
-       <property name="text">
-        <string>milliL/hour</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">rate_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="dispense_rate_label">
-       <property name="text">
-        <string>Dispense Rate</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="5">
-      <widget class="QRadioButton" name="microLhour_radio">
-       <property name="text">
-        <string>microL/hour</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">rate_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QRadioButton" name="milliL_radio">
-       <property name="text">
-        <string>milliliters</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">volume_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="6" column="4">
-      <widget class="QRadioButton" name="microLmin_radio">
-       <property name="text">
-        <string>microL/min</string>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">rate_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="5" column="3">
-      <widget class="QRadioButton" name="microL_radio">
-       <property name="text">
-        <string>microliters</string>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <attribute name="buttonGroup">
-        <string notr="true">volume_buttongroup</string>
-       </attribute>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLineEdit" name="dispense_rate_edit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
-       </property>
-       <property name="clearButtonEnabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Spray Width (inches) </string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="1">
-      <widget class="QLineEdit" name="lineEdit_2">
+     <item row="2" column="2">
+      <widget class="QLineEdit" name="maxWidth_edit">
        <property name="maximumSize">
         <size>
          <width>75</width>
@@ -425,8 +197,5 @@
  </connections>
  <buttongroups>
   <buttongroup name="microstepping_buttongroup"/>
-  <buttongroup name="spraymode_buttongroup"/>
-  <buttongroup name="volume_buttongroup"/>
-  <buttongroup name="rate_buttongroup"/>
  </buttongroups>
 </ui>

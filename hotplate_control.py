@@ -1,8 +1,8 @@
 from pyqtTemp import adatemp
 import RPi.GPIO as GPIO
 from PyQt5.QtCore import QThread, pyqtSignal, QTimer, QEventLoop
+import pyqtgraph as pg
 import smbus
-from pyqtMpl import MplCanvas
 
 hotplate_relay = 11
 BUS = 1
@@ -12,27 +12,29 @@ REGISTER = 0x00 #ADDRESS OF THE REGISTER WIPER 'A' ON THE TPL0102
 #USING THE RHEOSTAT FOR PID CONTROL OF THE HEATING ELEMENT BY USE OF DIMMER FUNCTION ON HOTPLATE POWER SUPPLY
 
 class thermocouplecontrol(QThread):
-	new_temp = pyqtSignal(float)
-	
-	def __init__(self, matplotlib):
+	temperature_data = pyqtSignal(float)
+
+	def __init__(self, plottingwidget):
 		QThread.__init__(self)
-		self.__plt = matplotlib
+		self.__plt = plottingwidget
 		self.thermocouple = adatemp()
 		self.timer = QTimer()
 		self.__temperature = [[0],[self.thermocouple.temp()]]
 		self.timer.moveToThread(self)
 		self.timer.timeout.connect(self.new_temp_emit)
 		
-		
 	def run(self):
 		self.timer.start(1000)
 		EventLoop = QEventLoop()
 		EventLoop.exec_()
+		
 	def new_temp_emit(self):
 		previous_time = self.__temperature[0][-1]
-		self.__temperature[0].append(previous_time +1)
-		self.__temperature[1].append(self.thermocouple.temp())
-		self.__plt.update_figure(self.__temperature[0], self.__temperature[1])
+		current_temp = float(self.thermocouple.temp())
+		self.__temperature[0].append(previous_time + 1.0)
+		self.__temperature[1].append(current_temp)
+		self.__plt.plot(self.__temperature[0], self.__temperature[1], pen=pg.mkPen('r'))
+		self.temperature_data.emit(current_temp)
 
 '''
 
