@@ -1,6 +1,6 @@
 from pyqtTemp import adatemp
 import RPi.GPIO as GPIO
-from PyQt5.QtCore import QThread, pyqtSignal, QTimer, QEventLoop
+from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer, QEventLoop, QObject
 import pyqtgraph as pg
 import smbus
 
@@ -11,32 +11,27 @@ ADDRESS = 0x50#ADDRESS OF TPL0102 DIGITAL POTENTIOMETER WITH 256 TAPS
 REGISTER = 0x00 #ADDRESS OF THE REGISTER WIPER 'A' ON THE TPL0102
 #USING THE RHEOSTAT FOR PID CONTROL OF THE HEATING ELEMENT BY USE OF DIMMER FUNCTION ON HOTPLATE POWER SUPPLY
 
-class thermocouplecontrol(QThread):
+class thermocouplecontrol(QObject):
 	temperature_data = pyqtSignal(float)
 
 	def __init__(self):
-		QThread.__init__(self)
+		QObject.__init__(self)
 		self.thermocouple = adatemp()
 		self.timer = QTimer()
-		self.timer.moveToThread(self)
 		self.timer.timeout.connect(self.new_temp_emit)
-		
-	def run(self):
 		self.timer.start(1000)
-		EventLoop = QEventLoop()
-		EventLoop.exec_()
-		
+	
 	def new_temp_emit(self):
 		current_temp = self.thermocouple.temp()
 		self.temperature_data.emit(current_temp)
 
-'''
 
-class hotplatecontrol(QThread):
-	new_temperature = pyqtSignal(float)
 
-	def __init__(self, p = 0, i = 0, d = 0):
-		super(hotplatecontrol, self).__init__()
+class hotplatecontrol(QObject):
+	register_value = pyqtSignal(int)
+
+	def __init__(self, p = 1.0, i = 15.0, d = 2.0):
+		QObject.__init__(self)
 		GPIO.setwarnings(False)
 		GPIO.setmode(GPIO.BOARD)
 		GPIO.setup(hotplate_relay, GPIO.OUT)
@@ -57,6 +52,8 @@ class hotplatecontrol(QThread):
 		self.__derivator = 0.0
 		
 		self.__heating_sentinal = False
+		self.write_PID(0)
+
 		
 	def set_kp(self, p):
 		self.__kp = p
@@ -90,16 +87,26 @@ class hotplatecontrol(QThread):
 		GPIO.output(hotplate_relay, GPIO.LOW)
 		return GPIO.input(hotplate_relay)
 		
-	def go_to_setpoint(self, setpoint):
+	def query_relay(self):
+		return GPIO.input(hotplate_relay)
+		
+	def setPoint_start(self, setpoint):
 		self.__integrator = 0.0
 		self.__derivator = 0.0
-		self.__heating_sentinal = True
-		self.activate_relay()
 		self.__setpoint = setpoint
-		while self.__heating_sentinal:
-			current_temp = adatemp.temp()
+		self.__heating_sentinal = True
+		#Dim Hotplate PowerSupply to zero
+		self.write_PID(0)
+		self.register_value.emit(0)
+		#Turn on hotplate
+		self.activate_relay()
+	
+	@pyqtSlot(float)	
+	def calculatePID(self, current_temp):
+		if self.__heating_sentinal:
 			value = self.update(current_temp)
 			self.write_PID(value)
+
 			
 	def terminate_heating(self):
 		self.__heating_sentinal = False
@@ -115,7 +122,8 @@ class hotplatecontrol(QThread):
 		if val < 0:
 			val = 0
 		val = int(val)
-		self.bus.write_byte_data(ADDRESS, REGISTER, hex(val))
+		self.bus.write_byte_data(ADDRESS, REGISTER, val)
+		self.register_value.emit(val)
 		return self.bus.read_byte_data(ADDRESS, REGISTER)
 		
 	def update(self, current):
@@ -129,7 +137,7 @@ class hotplatecontrol(QThread):
 		self.__integrator = self.__integrator + self.__error
 		if self.__integrator > 500:
 			self.__integrator = 500
-		elif self.integrator < -500:
+		elif self.__integrator < -500:
 			self.__integrator = -500
 			
 		self.__ivalue = self.__ki*self.__integrator
@@ -138,5 +146,4 @@ class hotplatecontrol(QThread):
 		
 		return PID
 		
-class hotplate_QThread
-'''
+

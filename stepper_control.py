@@ -80,8 +80,6 @@ class motorcontrol:
 		self.set_dir(back_dir)
 		self.counted_steps(half_steps)
 		self.reverse_dir()
-		print("Delay Set To: ", self.get_delay())
-		print("microstepping set to: ", self.get_microstepping())
 		for i in range(cycles):
 			start = timer()
 			self.counted_steps(total_steps)

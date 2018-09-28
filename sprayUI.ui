@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1125</width>
-    <height>708</height>
+    <height>735</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,14 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="PlotWidget" name="graphicsView"/>
+     <widget class="PlotWidget" name="graphicsView">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>420</height>
+       </size>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -92,12 +99,26 @@
        <widget class="QLabel" name="hotplateStatus_label">
         <property name="font">
          <font>
+          <family>PibotoLt</family>
           <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
         <property name="text">
          <string>HOTPLATE OFF</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="hotplatePercent_label">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>(0%)</string>
         </property>
        </widget>
       </item>
@@ -428,7 +449,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="loadedProfile_label">
         <property name="minimumSize">
          <size>
           <width>100</width>
