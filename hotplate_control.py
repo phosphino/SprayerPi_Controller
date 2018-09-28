@@ -14,12 +14,10 @@ REGISTER = 0x00 #ADDRESS OF THE REGISTER WIPER 'A' ON THE TPL0102
 class thermocouplecontrol(QThread):
 	temperature_data = pyqtSignal(float)
 
-	def __init__(self, plottingwidget):
+	def __init__(self):
 		QThread.__init__(self)
-		self.__plt = plottingwidget
 		self.thermocouple = adatemp()
 		self.timer = QTimer()
-		self.__temperature = [[0],[self.thermocouple.temp()]]
 		self.timer.moveToThread(self)
 		self.timer.timeout.connect(self.new_temp_emit)
 		
@@ -29,11 +27,7 @@ class thermocouplecontrol(QThread):
 		EventLoop.exec_()
 		
 	def new_temp_emit(self):
-		previous_time = self.__temperature[0][-1]
-		current_temp = float(self.thermocouple.temp())
-		self.__temperature[0].append(previous_time + 1.0)
-		self.__temperature[1].append(current_temp)
-		self.__plt.plot(self.__temperature[0], self.__temperature[1], pen=pg.mkPen('r'))
+		current_temp = self.thermocouple.temp()
 		self.temperature_data.emit(current_temp)
 
 '''

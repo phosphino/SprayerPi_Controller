@@ -114,6 +114,13 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="clearPlot_button">
+        <property name="text">
+         <string>Clear Temperature Plot</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>

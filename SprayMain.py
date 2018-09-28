@@ -14,14 +14,15 @@ from pyqtTemp import *
 import time 
 import pyqtgraph as pg
 
+pg.setConfigOption('foreground', 'y')
 
 class mainwindow(Ui_MainWindow):
 	def __init__(self, mainwindow):
 		Ui_MainWindow.__init__(self)
 		self.setupUi(mainwindow)
 		
-		self.__settingsDict = OrderedDict()
-		self.__settingsDictKeys = None
+		self.__spraysettingsDict = OrderedDict()
+		self.__motorsettingsItems = []
 				
 		self.settings_dialog = QtWidgets.QDialog()
 		self.dialog = Ui_MotorSettings()
@@ -32,14 +33,15 @@ class mainwindow(Ui_MainWindow):
 		self.__plt = self.graphicsView
 		self.__plt.setLabel('left','Temperature', 'Celsius')
 		self.__plt.setLabel('bottom', 'Time', 'seconds')
-		self.__plt.enableAutoRange()
 		
 		self.dialog.microstepping_comboBox.setCurrentIndex(2)
 		
-		self.setup_settings_container()
+		self.thermocouple = thermocouplecontrol()
+		self.__thermocouple_time = [0]
+		self.__thermocouple_temp = [self.thermocouple.thermocouple.temp()]
 		
-		self.thermocouple = thermocouplecontrol(self.__plt)
-		
+		self.__plt.plot(self.__thermocouple_time, self.__thermocouple_temp)
+		self.__curve = self.__plt.plot(pen = 'c')
 		
 
 		
@@ -53,29 +55,33 @@ class mainwindow(Ui_MainWindow):
 		'''
 		self.actionSettings.triggered.connect(self.launch_settings)
 		self.actionSave_Profile.triggered.connect(self.save_settings)
-		self.thermocouple.temperature_data.connect(self.updateLCD)
+		self.thermocouple.temperature_data.connect(self.updateTemperature)
 		#self.actionLoad_Profile.triggered.connect(self.load_settings)
 		
 		self.thermocouple.start()
 		
 	def setup_settings_container(self):
-		self.__settingsDict[self.dialog.delay_label] = self.dialog.delay_edit
-		self.__settingsDict[self.dialog.microstepping_Label] = self.dialog.microstepping_comboBox
-		self.__settingsDict[self.dialog.maxWidth_label] = self.dialog.maxWidth_edit
-		self.__settingsDict[self.sprayMode_label] = self.sprayMode_comboBox
-		self.__settingsDict[self.dispenseVolume_label] = self.dispenseVolume_edit
-		self.__settingsDict[self.dispenseUnits_label] = self.dispenseUnits_comboBox
-		self.__settingsDict[self.dispenseRate_label] = self.dispenseRate_edit
-		self.__settingsDict[self.rateUnits_label] = self.rateUnits_comboBox
-		self.__settingsDict[self.pause_label] = self.pause_edit
-		self.__settingsDict[self.sprayWidth_label] = self.sprayWidth_edit
-		self.__settingsDict[self.setPoint_label] = self.setPoint_edit
+		#add motor settings to settings dictionary
+		self.__spraysettingsDict[self.dialog.delay_label] = self.dialog.delay_edit
+		self.__spraysettingsDict[self.dialog.microstepping_Label] = self.dialog.microstepping_comboBox
+		self.__spraysettingsDict[self.dialog.maxWidth_label] = self.dialog.maxWidth_edit
+		#need a list which keeps track of which settings go in the dialog
+		for key, value in self.__spraysettingsDict.items():
+			self.__motorsettingsItems.append(key.text())		
+		print(self.__motorsettingsItems)
+		self.__spraysettingsDict[self.sprayMode_label] = self.sprayMode_comboBox
+		self.__spraysettingsDict[self.dispenseVolume_label] = self.dispenseVolume_edit
+		self.__spraysettingsDict[self.dispenseUnits_label] = self.dispenseUnits_comboBox
+		self.__spraysettingsDict[self.dispenseRate_label] = self.dispenseRate_edit
+		self.__spraysettingsDict[self.rateUnits_label] = self.rateUnits_comboBox
+		self.__spraysettingsDict[self.pause_label] = self.pause_edit
+		self.__spraysettingsDict[self.sprayWidth_label] = self.sprayWidth_edit
+		self.__spraysettingsDict[self.setPoint_label] = self.setPoint_edit
 		
-		self.__settingsDictKeys = list(self.__settingsDict.keys())
 		
 	def check_settings(self):
 		try:
-			temporary_delay = float(self.__settingsDict[self.dialog.delay_label].text())
+			temporary_delay = float(self.__spraysettingsDict[self.dialog.delay_label].text())
 			if temporary_delay < 200 or temporary_delay > 500:
 				self.user_settings_error('File->Settings: motor delay out of range')
 				return False
@@ -84,7 +90,7 @@ class mainwindow(Ui_MainWindow):
 			return False
 		
 		try:
-			temporary_maxWidth = float(self.__settingsDict[self.dialog.maxWidth_label].text())
+			temporary_maxWidth = float(self.__spraysettingsDict[self.dialog.maxWidth_label].text())
 			if temporary_maxWidth <= 0:
 				self.user_settings_error('File->Settings: track width must be a positive, non-zero value')
 				return False
@@ -93,7 +99,7 @@ class mainwindow(Ui_MainWindow):
 			return False
 		
 		try:
-			temporary_volume = float(self.__settingsDict[self.dispenseVolume_label].text())
+			temporary_volume = float(self.__spraysettingsDict[self.dispenseVolume_label].text())
 			if temporary_volume <= 0:
 				self.user_settings_error('Dispense volume must be a positive, non-zero value')
 				return False
@@ -102,7 +108,7 @@ class mainwindow(Ui_MainWindow):
 			return False
 			
 		try:
-			temporary_rate = float(self.__settingsDict[self.dispenseRate_label].text())
+			temporary_rate = float(self.__spraysettingsDict[self.dispenseRate_label].text())
 			if temporary_rate <=0:
 				self.user_settings_error('Dispensing rate must be a positive, non-zero value')
 				return False
@@ -112,7 +118,7 @@ class mainwindow(Ui_MainWindow):
 			return False
 			
 		try:
-			temporary_pause = float(self.__settingsDict[self.pause_label].text())
+			temporary_pause = float(self.__spraysettingsDict[self.pause_label].text())
 			if temporary_pause <= 0:
 				self.user_settings_error('Pause time must be a positive, non-zero value')
 				return False
@@ -122,7 +128,7 @@ class mainwindow(Ui_MainWindow):
 			return False
 		
 		try:
-			temporary_width = float(self.__settingsDict[self.sprayWidth_label].text())
+			temporary_width = float(self.__spraysettingsDict[self.sprayWidth_label].text())
 			if temporary_width <=0 or temporary_width > temporary_maxWidth:
 				self.user_settings_error('Spray width must be greater than zero and less than the track width')
 				return False
@@ -132,7 +138,7 @@ class mainwindow(Ui_MainWindow):
 			return False
 		
 		try:
-			temporary_setpoint = float(self.__settingsDict[self.setPoint_label].text())
+			temporary_setpoint = float(self.__spraysettingsDict[self.setPoint_label].text())
 			if temporary_setpoint < 0 or temporary_setpoint > 750:
 				self.user_settings_error('Hotplate setpoint out of range')
 				return False
@@ -140,18 +146,34 @@ class mainwindow(Ui_MainWindow):
 		except:
 			self.user_settings_error('Hotplate setpoint must be numeric')
 			return False	
-		
-				
-			
-
+	
+	def get_save_settings(self):
+		settings = []
+		for key, value in self.__spraysettingsDict.items():
+			if type(value) == type(self.dialog.microstepping_comboBox):
+				entry = [key.text(), value.currentText()]
+				settings.append(entry)
+		print(settings)
 	
 	def save_settings(self):
-		if self.check_settings() == False:
-			return 
-		pass
+		#if self.check_settings() == False:
+			#return 
+		#file_name = QtWidgets.QFileDialog.getSaveFileName(None, 'Save Settings', '/home/Documents/GitHub/', "CSV (*.csv)")
+		settings = self.get_save_settings()
 		
 		
-	def updateLCD(self, val):
+		
+	def updateTemperature(self, val):
+		self.__thermocouple_time.append(self.__thermocouple_time[-1]+ 1)
+		self.__thermocouple_temp.append(val)
+		#if len(self.__thermocouple_time) > 60:
+		#	self.__thermocouple_time.pop(0)
+		#	self.__thermocouple_temp.pop(0)
+		#	print(self.__thermocouple_time[0])
+		#self.__curve.disableAutoRange()
+		#self.__plt.plot(self.__thermocouple_time, self.__thermocouple_temp)
+		self.__curve.setData(self.__thermocouple_time, self.__thermocouple_temp)
+		#self.__curve.enableAutoRange()
 		self.currentTemp_lcd.display(val)
 		
 	def launch_settings(self):
