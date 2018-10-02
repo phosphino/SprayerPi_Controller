@@ -1,10 +1,11 @@
 Motor Delay (microsec),400
 Microstepping,1/4
-Track Length (inches),4.075
+Track Length (inches),4.764
 Spray Mode,Pneumatic
+Number of Sprays,10
 Volume to Dispense,4
 Volume Units,milliliters
-Dispense Rate,45
+Dispense Rate,1.9
 Dispense Rate Units,milliliters/minute
 Pause Time (sec),0
 Spray Width (inches),1

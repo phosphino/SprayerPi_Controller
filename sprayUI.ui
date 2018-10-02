@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1125</width>
+    <width>1285</width>
     <height>735</height>
    </rect>
   </property>
@@ -123,6 +123,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="hotplate_toggle">
+        <property name="text">
+         <string>Hotplate ON</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -162,7 +169,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
+         <item row="0" column="4">
           <widget class="QLabel" name="dispenseVolume_label">
            <property name="layoutDirection">
             <enum>Qt::LeftToRight</enum>
@@ -201,23 +208,7 @@
            </item>
           </widget>
          </item>
-         <item row="1" column="5">
-          <widget class="QLineEdit" name="sprayWidth_edit">
-           <property name="minimumSize">
-            <size>
-             <width>75</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>75</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="5">
+         <item row="0" column="7">
           <widget class="QComboBox" name="dispenseUnits_comboBox">
            <property name="minimumSize">
             <size>
@@ -243,7 +234,7 @@
            </item>
           </widget>
          </item>
-         <item row="0" column="4">
+         <item row="0" column="6">
           <widget class="QLabel" name="dispenseUnits_label">
            <property name="text">
             <string>Volume Units</string>
@@ -253,7 +244,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
+         <item row="0" column="5">
           <widget class="QLineEdit" name="dispenseVolume_edit">
            <property name="minimumSize">
             <size>
@@ -269,33 +260,7 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="7">
-          <widget class="QLineEdit" name="setPoint_edit">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>125</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="inputMethodHints">
-            <set>Qt::ImhDigitsOnly</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="6">
-          <widget class="QLabel" name="setPoint_label">
-           <property name="text">
-            <string>Setpoint (Celsius)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="6">
+         <item row="0" column="8">
           <widget class="QLabel" name="dispenseRate_label">
            <property name="text">
             <string>Dispense Rate</string>
@@ -305,7 +270,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="7">
+         <item row="0" column="9">
           <widget class="QLineEdit" name="dispenseRate_edit">
            <property name="minimumSize">
             <size>
@@ -325,48 +290,6 @@
           <widget class="QLabel" name="rateUnits_label">
            <property name="text">
             <string>Dispense Rate Units</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="4">
-          <widget class="QLabel" name="sprayWidth_label">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>150</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Spray Width (inches)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLineEdit" name="pause_edit">
-           <property name="maximumSize">
-            <size>
-             <width>75</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLabel" name="pause_label">
-           <property name="text">
-            <string>Pause Time (sec)</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -407,6 +330,107 @@
              <string>microliters/hour</string>
             </property>
            </item>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLabel" name="sprayNumber_label">
+           <property name="text">
+            <string>Number of Sprays</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QLineEdit" name="sprayNumber_edit">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="pause_label">
+           <property name="text">
+            <string>Pause Time (sec)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLineEdit" name="pause_edit">
+           <property name="maximumSize">
+            <size>
+             <width>75</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <widget class="QLabel" name="sprayWidth_label">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Spray Width (inches)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="5">
+          <widget class="QLineEdit" name="sprayWidth_edit">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>75</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="6">
+          <widget class="QLabel" name="setPoint_label">
+           <property name="text">
+            <string>Setpoint (Celsius)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="7">
+          <widget class="QLineEdit" name="setPoint_edit">
+           <property name="minimumSize">
+            <size>
+             <width>50</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>125</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="inputMethodHints">
+            <set>Qt::ImhDigitsOnly</set>
+           </property>
           </widget>
          </item>
         </layout>
@@ -481,9 +505,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="hotplate_toggle">
+       <widget class="QPushButton" name="newSetpoint_button">
         <property name="text">
-         <string>Hotplate ON</string>
+         <string>Go To Setpoint</string>
         </property>
        </widget>
       </item>
@@ -519,7 +543,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1125</width>
+     <width>1285</width>
      <height>26</height>
     </rect>
    </property>

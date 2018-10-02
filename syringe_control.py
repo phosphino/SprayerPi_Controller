@@ -36,10 +36,10 @@ class syringecontrol(serial.Serial):
 		#address is optional if pump address is 00 but used here for clarity
 		
 		self.__rateunits = {
-							'microL/min' : 'UM*',
-							'milliL/min' : 'MM*',
-							'microL/hr' : 'UH*',
-							'milliL/hr' : 'MH*'
+							2 : 'UM*',
+							0 : 'MM*',
+							3 : 'UH*',
+							1 : 'MH*'
 								}
 		
 		self.__rsp = None
@@ -99,9 +99,8 @@ class syringecontrol(serial.Serial):
 		return response
 		
 	#SET DISPENSING RATE
-	def set_rate(self, rate, units = 'milliL/min'):
+	def set_rate(self, rate, units = 0):
 		command = 'RAT'+self.formatfloat(rate)+self.__rateunits[units]
-		print('rate entered: '+command)
 		response = self.write_command(command)
 		if '?' in response:
 			raise Exception('Rate OOR for given units')
@@ -113,13 +112,13 @@ class syringecontrol(serial.Serial):
 		return response
 		
 	#SET VOLUME TO BE DISPENSED
-	def set_dispense_volume(self, vol, units='milliL'):
-		if units == 'milliL':
+	def set_dispense_volume(self, vol, units=0):
+		if units == 0:
 			command = 'VOLML'
 			response = self.write_command(command)
 			if '?' in response:
 				raise Exception('error in VOL mL unit change')
-		elif units == 'microL':
+		elif units == 1:
 			command = 'VOLUL'
 			response = self.write_command(command)
 			if '?' in response:

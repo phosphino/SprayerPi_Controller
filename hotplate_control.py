@@ -3,6 +3,7 @@ import RPi.GPIO as GPIO
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot, QTimer, QEventLoop, QObject
 import pyqtgraph as pg
 import smbus
+from time import sleep 
 
 hotplate_relay = 11
 BUS = 1
@@ -17,14 +18,12 @@ class thermocouplecontrol(QObject):
 	def __init__(self):
 		QObject.__init__(self)
 		self.thermocouple = adatemp()
-		self.timer = QTimer()
-		self.timer.timeout.connect(self.new_temp_emit)
-		self.timer.start(1000)
 	
 	def new_temp_emit(self):
-		current_temp = self.thermocouple.temp()
-		self.temperature_data.emit(current_temp)
-
+		while True:
+			current_temp = self.thermocouple.temp()
+			self.temperature_data.emit(current_temp)
+			sleep(1)
 
 
 class hotplatecontrol(QObject):

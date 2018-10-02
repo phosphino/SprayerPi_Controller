@@ -10,6 +10,7 @@ from collections import OrderedDict
 import csv
 import numpy as np
 from hotplate_control import thermocouplecontrol, hotplatecontrol
+from spray_control import spraycontrol
 from pyqtTemp import *
 import time 
 import pyqtgraph as pg
@@ -23,6 +24,8 @@ class mainwindow(Ui_MainWindow):
 		
 		self.__spraysettingsDict = OrderedDict()
 		self.__motorsettingsItems = []
+		self.__motorlock = False
+		self.__plotlock = False
 				
 		self.settings_dialog = QtWidgets.QDialog()
 		self.dialog = Ui_MotorSettings()
@@ -38,15 +41,21 @@ class mainwindow(Ui_MainWindow):
 		
 		self.hotplate = hotplatecontrol()
 		self.thermocouple = thermocouplecontrol()
+		self.spraycontrol = spraycontrol()
 		
 		self.__thermocouple_time = [0]
 		self.__thermocouple_temp = [self.thermocouple.thermocouple.temp()]
-		
-		self.__plt.plot(self.__thermocouple_time, self.__thermocouple_temp)
 		self.__curve = self.__plt.plot(pen = 'm')
 		
 		
-
+		self.spray_QThread = QtCore.QThread()#Thread for performing calibrations
+		self.temperature_QThread = QtCore.QThread()#Thread for monitoring temperature
+		
+		self.thermocouple.moveToThread(self.temperature_QThread)
+		self.spraycontrol.moveToThread(self.spray_QThread)
+		
+		
+		
 		'''
 		BEGIN: SIGNAL/SLOT 
 		
@@ -60,20 +69,114 @@ class mainwindow(Ui_MainWindow):
 		
 		self.thermocouple.temperature_data.connect(self.updateTemperature)
 		self.thermocouple.temperature_data.connect(self.hotplate.calculatePID)
+		self.spraycontrol.operation_done.connect(self.unlockPlot)
+		
+		self.dialog.calibrate_button.clicked.connect(self.setMode_Calibrate)
+		self.startRun_button.clicked.connect(self.setMode_Run)
+		
+		self.spraycontrol.motor_sweep_complete.connect(self.updatePlot)
+		self.temperature_QThread.started.connect(self.thermocouple.new_temp_emit)
+		self.spray_QThread.started.connect(self.spraycontrol.perform_operation)
+		
+		
 		
 		self.hotplate.register_value.connect(self.updateHeating_power)
 		self.hotplate.terminate_heating()
 		
+		self.temperature_QThread.start()
 		
-	def printCheck(self):
-		print('HERE')
+	def print_Check(self):
+		print("THREAD FINISHED")
+		
+	def setMode_Calibrate(self):
+		if self.spray_QThread.isRunning():
+			self.spray_QThread.exit()
+		try:
+			track_length = float(self.__spraysettingsDict[self.dialog.maxWidth_label].text())
+			if track_length < 0:
+				self.user_settings_error('Track length must be greater than zero')
+				return
+		except:
+			self.user_settings_error('Input a numeric value for track length')
+			return
+		
+		self.__plotlock = True
+		self.spraycontrol.stepperMotor.set_track_width_inches(track_length)
+		self.spraycontrol.set_operationMode(0)
+		self.spray_QThread.start()
 	
+	def setMode_Run(self):
+		if self.spray_QThread.isRunning():
+			self.spray_QThread.exit()
+		
+		if self.setMotorSpray_settings():
+			self.__plotlock = True
+			self.spraycontrol.set_operationMode(1)
+			self.spray_QThread.start()
+	
+	def setMotorSpray_settings(self):
+		if self.check_settings == False:
+			return False
+		motor_delay = float(self.__spraysettingsDict[self.dialog.delay_label].text()) * 10**(-6)#convert microseconds to seconds
+		print('motor delay ', motor_delay)
+		microstepping = int(self.__spraysettingsDict[self.dialog.microstepping_label].currentIndex())
+		print('microstepping key: ',microstepping)
+		track_length = float(self.__spraysettingsDict[self.dialog.maxWidth_label].text())
+		print('track length: ', track_length)
+		self.spraycontrol.setMotor_settings(motor_delay, microstepping, track_length)
+		
+		spraymode = self.__spraysettingsDict[self.sprayMode_label].currentIndex()
+		print('spraymode: ',spraymode)
+		cycles = int(self.__spraysettingsDict[self.sprayNumber_label].text())
+		print('cycles: ', cycles)
+		volume = float(self.__spraysettingsDict[self.dispenseVolume_label].text())
+		print('volume: ', volume)
+		vol_units = self.__spraysettingsDict[self.dispenseUnits_label].currentIndex()
+		print('vol_units key: ', vol_units)
+		dispense_rate = float(self.__spraysettingsDict[self.dispenseRate_label].text())
+		print('dispense_rate: ', dispense_rate)
+		dispense_units = self.__spraysettingsDict[self.dispenseUnits_label].currentIndex()
+		print('dispense_units key: ', dispense_units)
+		pause_time = float(self.__spraysettingsDict[self.pause_label].text())
+		print('pause time: ', pause_time)
+		spray_width = float(self.__spraysettingsDict[self.sprayWidth_label].text())
+		print('spray_width: ', spray_width)
+		try:
+			self.spraycontrol.setSpray_settings(spraymode, cycles, volume, vol_units, dispense_rate, dispense_units, pause_time, spray_width)
+		except Exception as e:
+			self.user_settings_error(str(e))
+			return False
+		return True
+	'''	
+	def setMotor_settings(self, motor_delay, microstepping, track_length):
+		self.stepperMotor.set_delay(motor_delay)
+		self.stepperMotor.set_microstepping(microstepping)
+		self.stepperMotor.set_track_width(track_length)
+		
+	def setSpray_settings(self, spraymode, cycles, volume, vol_units, dispense_rate,
+							dispense_units, pause_time, spray_width):
+				
+		self.__selectedSpray_mode = spraymode
+		self.syringePump.setRate(dispense_rate, units = dispense_units)
+		self.syringePump.set_dispense_volume(volume, units = vol_units)
+		self.stepperMotor.setPause_time(pause_time)
+		self.stepperMotor.setSpray_width(spray_width)
+		self.stepperMotor.setCycle_number(cycles)
+	'''
+		
+	def unlockPlot(self, boolean):
+		if boolean:
+			self.__plotlock = False
+
+		
+		
 	def setup_settings_container(self):
 		#add motor settings to settings dictionary
 		self.__spraysettingsDict[self.dialog.delay_label] = self.dialog.delay_edit
-		self.__spraysettingsDict[self.dialog.microstepping_Label] = self.dialog.microstepping_comboBox
+		self.__spraysettingsDict[self.dialog.microstepping_label] = self.dialog.microstepping_comboBox
 		self.__spraysettingsDict[self.dialog.maxWidth_label] = self.dialog.maxWidth_edit
 		self.__spraysettingsDict[self.sprayMode_label] = self.sprayMode_comboBox
+		self.__spraysettingsDict[self.sprayNumber_label] = self.sprayNumber_edit
 		self.__spraysettingsDict[self.dispenseVolume_label] = self.dispenseVolume_edit
 		self.__spraysettingsDict[self.dispenseUnits_label] = self.dispenseUnits_comboBox
 		self.__spraysettingsDict[self.dispenseRate_label] = self.dispenseRate_edit
@@ -101,6 +204,16 @@ class mainwindow(Ui_MainWindow):
 		except:
 			self.user_settings_error('File->Settings: track width must be numeric')
 			return False
+			
+		try:
+			temporary_cycleNumber = int(self.__spraysettingsDict[self.sprayNumber_label].text())
+			if temporary_cycleNumber <=0:
+				self.user_settings_error('Number of spray cycles must be a positive number')
+			
+		except:
+			self.user_settings_error('Number of spray cycles must be numeric')
+			return False
+				
 		
 		try:
 			temporary_volume = float(self.__spraysettingsDict[self.dispenseVolume_label].text())
@@ -193,7 +306,6 @@ class mainwindow(Ui_MainWindow):
 		
 		#setting the settings
 		for row in input_settings:
-			print(row[0],row[1])
 			for key, value in self.__spraysettingsDict.items():
 				if row[0] == key.text():
 					if type(value) == type(self.dialog.microstepping_comboBox):
@@ -209,17 +321,23 @@ class mainwindow(Ui_MainWindow):
 	def updateTemperature(self, val):
 		self.__thermocouple_time.append(self.__thermocouple_time[-1]+ 1)
 		self.__thermocouple_temp.append(val)
+
+		if self.__plotlock == False:
+			self.updatePlot()		
+		self.currentTemp_lcd.display(val)
+		
+	def updatePlot(self):
 		#disableAutoRange then plot then enableAutoRange instead of just keeping enableAutoRange() always enabled increases speed of plotting according to internet
 		#self.__plt.disableAutoRange
 		self.__curve.setData(self.__thermocouple_time, self.__thermocouple_temp)
 		#self.__plt.enableAutoRange()
-		self.currentTemp_lcd.display(val)
-		
+				
 	def toggle_heating(self):
 		print(self.hotplate.query_relay())
 		if self.hotplate.query_relay()==1:
 			print('turning off')
 			self.hotplate.terminate_heating()
+			self.hotplate_toggle.setText("Hotplate ON")
 			return
 			
 		try:
@@ -229,10 +347,11 @@ class mainwindow(Ui_MainWindow):
 			return
 		print('turning on')
 		self.hotplate.setPoint_start(setpoint)
+		self.hotplate_toggle.setText("Hotplate OFF")
 		
 	def updateHeating_power(self, register_value):
 		percentage = 100.0*(float(register_value) / 255.0)
-		self.hotplatePercent_label.setText(str(percentage)+'%')
+		self.hotplatePercent_label.setText('{0:.1f} %'.format(percentage))
 		
 		
 	def launch_settings(self):

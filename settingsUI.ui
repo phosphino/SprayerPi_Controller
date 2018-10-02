@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>351</width>
-    <height>156</height>
+    <height>193</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -28,7 +28,7 @@
   <property name="maximumSize">
    <size>
     <width>351</width>
-    <height>156</height>
+    <height>193</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -44,30 +44,6 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="2">
-      <widget class="QLineEdit" name="delay_edit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="microstepping_Label">
-       <property name="text">
-        <string>Microstepping</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="maxWidth_label">
-       <property name="text">
-        <string>Track Length (inches)</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="delay_label">
        <property name="text">
@@ -109,10 +85,27 @@
        </item>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="microstepping_label">
+       <property name="text">
+        <string>Microstepping</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="3">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>(200-500)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLineEdit" name="delay_edit">
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>16777215</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -123,6 +116,40 @@
          <width>75</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="text">
+        <string>4.764</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="maxWidth_label">
+       <property name="text">
+        <string>Track Length (inches)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="calibrate_button">
+       <property name="text">
+        <string>Calibrate</string>
        </property>
       </widget>
      </item>
@@ -195,7 +222,4 @@
    </hints>
   </connection>
  </connections>
- <buttongroups>
-  <buttongroup name="microstepping_buttongroup"/>
- </buttongroups>
 </ui>
