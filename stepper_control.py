@@ -8,12 +8,17 @@ from PyQt5.QtCore import QObject, pyqtSignal
 DIR = 38
 STEP = 40
 ENABLE = 33
+
 front_switch = 36
 back_switch = 32
+
 microstepping = (18,16,12)#Board numbers for microstepping pins
 
+gas_solenoid = 37
+ultrasonic_switch = 35
+
 front_dir = 1
-back_dir = 0	
+back_dir = 0
 microstep_map = {0 : (0,0,0), 1 : (1,0,0), 2 : (0,1,0), 3 :(1,1,0), 4 :(0,0,1), 5 : (0,1,1)}
 
 class motorcontrol(QObject):
@@ -27,7 +32,7 @@ class motorcontrol(QObject):
 		self.__track_width_inches = 4.764 #Track length in inches
 		self.__go_sentinal = False #sentinal for moving motor
 		self.__delay = 0.001 #delay between step pulses
-		self.__travel_delay = 0.0006
+		self.__travel_delay = 0.001
 		self.__travel_microstepping = 0
 		self.__track_width_steps = None#Steps to cross track
 		self.__inches_per_step = None#how many inches traveled per step 
@@ -55,6 +60,7 @@ class motorcontrol(QObject):
 		self.set_delay(self.__travel_delay)
 		self.set_microstepping(self.__travel_microstepping)
 		width = []
+		self.check_dir()
 		if 0 not in self.get_endstop_state():
 			self.__go_sentinal = True
 			while self.__go_sentinal:
@@ -110,6 +116,7 @@ class motorcontrol(QObject):
 		self.reverse_dir()
 		sweeps = int(self.__cycleNumber * 2)
 		for i in range(sweeps):
+			
 			for i in range(spray_width_steps):
 				if self.__go_sentinal == False:
 					break
@@ -120,7 +127,7 @@ class motorcontrol(QObject):
 				sleep(self.__pause_time)
 	
 	
-			
+
 	
 	def set_pause_time(self, pause_time):
 		self.__pause_time = pause_time

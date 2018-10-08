@@ -92,20 +92,10 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="label_4">
+     <item row="2" column="0">
+      <widget class="QLabel" name="maxWidth_label">
        <property name="text">
-        <string>(200-500)</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLineEdit" name="delay_edit">
-       <property name="maximumSize">
-        <size>
-         <width>75</width>
-         <height>16777215</height>
-        </size>
+        <string>Track Length (inches)</string>
        </property>
       </widget>
      </item>
@@ -122,10 +112,20 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="maxWidth_label">
+     <item row="0" column="2">
+      <widget class="QLineEdit" name="delay_edit">
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QPushButton" name="testdelay_button">
        <property name="text">
-        <string>Track Length (inches)</string>
+        <string>Test</string>
        </property>
       </widget>
      </item>

@@ -189,7 +189,7 @@ class mainwindow(Ui_MainWindow):
 	def check_settings(self):
 		try:
 			temporary_delay = float(self.__spraysettingsDict[self.dialog.delay_label].text())
-			if temporary_delay < 200 or temporary_delay > 500:
+			if temporary_delay < 1 or temporary_delay > 2000:
 				self.user_settings_error('File->Settings: motor delay out of range')
 				return False
 		except:
