@@ -26,6 +26,8 @@ class mainwindow(Ui_MainWindow):
 		self.__motorsettingsItems = []
 		self.__motorlock = False
 		self.__plotlock = False
+		self.__syringe_params = {}
+		self.__spray_params = {}
 				
 		self.settings_dialog = QtWidgets.QDialog()
 		self.dialog = Ui_MotorSettings()
@@ -70,17 +72,18 @@ class mainwindow(Ui_MainWindow):
 		self.thermocouple.temperature_data.connect(self.updateTemperature)
 		self.thermocouple.temperature_data.connect(self.hotplate.calculatePID)
 		self.spraycontrol.operation_done.connect(self.unlockPlot)
+		self.spraycontrol.sweep_complete.connect(self.updatePlot)
 		
-		self.dialog.calibrate_button.clicked.connect(self.setMode_Calibrate)
-		self.startRun_button.clicked.connect(self.setMode_Run)
+		self.dialog.calibrate_button.clicked.connect(self.calibrateTrack)
+		self.dialog.testdelay_button.clicked.connect(self.test_motorSettings)
+		self.startRun_button.clicked.connect(self.run_spraySynthesis)
+		self.midpoint_button.clicked.connect(self.go_to_midpoint)
+
 		
-		self.spraycontrol.motor_sweep_complete.connect(self.updatePlot)
 		self.temperature_QThread.started.connect(self.thermocouple.new_temp_emit)
 		self.spray_QThread.started.connect(self.spraycontrol.perform_operation)
 		
-		
-		
-		self.hotplate.register_value.connect(self.updateHeating_power)
+
 		self.hotplate.terminate_heating()
 		
 		self.temperature_QThread.start()
@@ -88,7 +91,14 @@ class mainwindow(Ui_MainWindow):
 	def print_Check(self):
 		print("THREAD FINISHED")
 		
-	def setMode_Calibrate(self):
+	def go_to_midpoint(self):
+		if self.spray_QThread.isRunning():
+			self.spray_QThread.exit()
+		self.__plotlock = True
+		self.spraycontrol.set_operationMode(3)
+		self.spray_QThread.start()
+		
+	def calibrateTrack(self):
 		if self.spray_QThread.isRunning():
 			self.spray_QThread.exit()
 		try:
@@ -101,11 +111,24 @@ class mainwindow(Ui_MainWindow):
 			return
 		
 		self.__plotlock = True
-		self.spraycontrol.stepperMotor.set_track_width_inches(track_length)
+		self.spraycontrol.set_track_width_inches(track_length)
 		self.spraycontrol.set_operationMode(0)
 		self.spray_QThread.start()
 	
-	def setMode_Run(self):
+	def test_motorSettings(self):
+		if self.spray_QThread.isRunning():
+			self.spray_QThread.exit()
+		try: 
+			motor_delay = float(self.__spraysettingsDict[self.dialog.delay_label].text()) * 10**(-6)#convert microseconds to seconds
+			microstepping = int(self.__spraysettingsDict[self.dialog.microstepping_label].currentIndex())
+		except:
+			self.user_settings_error('Input Valid Values')
+		self.__plotlock = True
+		self.spraycontrol.set_traverseParameters(motor_delay, microstepping)
+		self.spraycontrol.set_operationMode(2)
+		self.spray_QThread.start()
+	
+	def run_spraySynthesis(self):
 		if self.spray_QThread.isRunning():
 			self.spray_QThread.exit()
 		
@@ -117,56 +140,43 @@ class mainwindow(Ui_MainWindow):
 	def setMotorSpray_settings(self):
 		if self.check_settings == False:
 			return False
-		motor_delay = float(self.__spraysettingsDict[self.dialog.delay_label].text()) * 10**(-6)#convert microseconds to seconds
-		print('motor delay ', motor_delay)
-		microstepping = int(self.__spraysettingsDict[self.dialog.microstepping_label].currentIndex())
-		print('microstepping key: ',microstepping)
-		track_length = float(self.__spraysettingsDict[self.dialog.maxWidth_label].text())
-		print('track length: ', track_length)
-		self.spraycontrol.setMotor_settings(motor_delay, microstepping, track_length)
 		
+		motor_delay = float(self.__spraysettingsDict[self.dialog.delay_label].text()) * 10**(-6)#convert microseconds to seconds
+		microstepping = int(self.__spraysettingsDict[self.dialog.microstepping_label].currentIndex())
+		track_length = float(self.__spraysettingsDict[self.dialog.maxWidth_label].text())		
 		spraymode = self.__spraysettingsDict[self.sprayMode_label].currentIndex()
-		print('spraymode: ',spraymode)
-		cycles = int(self.__spraysettingsDict[self.sprayNumber_label].text())
-		print('cycles: ', cycles)
 		volume = float(self.__spraysettingsDict[self.dispenseVolume_label].text())
-		print('volume: ', volume)
 		vol_units = self.__spraysettingsDict[self.dispenseUnits_label].currentIndex()
-		print('vol_units key: ', vol_units)
 		dispense_rate = float(self.__spraysettingsDict[self.dispenseRate_label].text())
-		print('dispense_rate: ', dispense_rate)
 		dispense_units = self.__spraysettingsDict[self.dispenseUnits_label].currentIndex()
-		print('dispense_units key: ', dispense_units)
 		pause_time = float(self.__spraysettingsDict[self.pause_label].text())
-		print('pause time: ', pause_time)
 		spray_width = float(self.__spraysettingsDict[self.sprayWidth_label].text())
-		print('spray_width: ', spray_width)
+
+		self.__spray_params = {'delay': motor_delay, 'pause_time' : pause_time, 'microstepping' : microstepping, 'width' : spray_width, 'mode' : spraymode}
+		
+		for key, value in self.__spray_params.items():
+			print(key+':', value)
+		
+		self.spraycontrol.set_sprayParameters(self.__spray_params)
+		
 		try:
-			self.spraycontrol.setSpray_settings(spraymode, cycles, volume, vol_units, dispense_rate, dispense_units, pause_time, spray_width)
+			self.__syringe_params = {'volume' : volume, 'vol_units' : vol_units, 'rate' : dispense_rate, 'rate_units' : dispense_units}
+			
+			for key, value in self.__syringe_params.items():
+				print(key+':', value)
+			
+			self.spraycontrol.set_syringeSettings(**self.__syringe_params)
 		except Exception as e:
 			self.user_settings_error(str(e))
 			return False
 		return True
-	'''	
-	def setMotor_settings(self, motor_delay, microstepping, track_length):
-		self.stepperMotor.set_delay(motor_delay)
-		self.stepperMotor.set_microstepping(microstepping)
-		self.stepperMotor.set_track_width(track_length)
-		
-	def setSpray_settings(self, spraymode, cycles, volume, vol_units, dispense_rate,
-							dispense_units, pause_time, spray_width):
-				
-		self.__selectedSpray_mode = spraymode
-		self.syringePump.setRate(dispense_rate, units = dispense_units)
-		self.syringePump.set_dispense_volume(volume, units = vol_units)
-		self.stepperMotor.setPause_time(pause_time)
-		self.stepperMotor.setSpray_width(spray_width)
-		self.stepperMotor.setCycle_number(cycles)
-	'''
+
 		
 	def unlockPlot(self, boolean):
 		if boolean:
 			self.__plotlock = False
+			if self.spray_QThread.isRunning():#exit thread upon completion of threaded operation
+				self.spray_QThread.exit()
 
 		
 		
@@ -176,7 +186,6 @@ class mainwindow(Ui_MainWindow):
 		self.__spraysettingsDict[self.dialog.microstepping_label] = self.dialog.microstepping_comboBox
 		self.__spraysettingsDict[self.dialog.maxWidth_label] = self.dialog.maxWidth_edit
 		self.__spraysettingsDict[self.sprayMode_label] = self.sprayMode_comboBox
-		self.__spraysettingsDict[self.sprayNumber_label] = self.sprayNumber_edit
 		self.__spraysettingsDict[self.dispenseVolume_label] = self.dispenseVolume_edit
 		self.__spraysettingsDict[self.dispenseUnits_label] = self.dispenseUnits_comboBox
 		self.__spraysettingsDict[self.dispenseRate_label] = self.dispenseRate_edit
@@ -203,17 +212,7 @@ class mainwindow(Ui_MainWindow):
 				return False
 		except:
 			self.user_settings_error('File->Settings: track width must be numeric')
-			return False
-			
-		try:
-			temporary_cycleNumber = int(self.__spraysettingsDict[self.sprayNumber_label].text())
-			if temporary_cycleNumber <=0:
-				self.user_settings_error('Number of spray cycles must be a positive number')
-			
-		except:
-			self.user_settings_error('Number of spray cycles must be numeric')
-			return False
-				
+			return False				
 		
 		try:
 			temporary_volume = float(self.__spraysettingsDict[self.dispenseVolume_label].text())

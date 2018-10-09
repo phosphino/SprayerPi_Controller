@@ -1,12 +1,11 @@
-Motor Delay (microsec),400
-Microstepping,1/4
+Motor Delay (microsec),1000
+Microstepping,1/1
 Track Length (inches),4.764
 Spray Mode,Pneumatic
-Number of Sprays,10
-Volume to Dispense,4
+Volume to Dispense,1.00
 Volume Units,milliliters
-Dispense Rate,1.9
+Dispense Rate,2.0
 Dispense Rate Units,milliliters/minute
 Pause Time (sec),0
-Spray Width (inches),1
+Spray Width (inches),2.25
 Setpoint (Celsius),453
