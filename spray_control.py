@@ -19,8 +19,8 @@ microstepping = (18,16,12)#Board numbers for microstepping pins
 gas_solenoid = 37
 ultrasonic_switch = 35
 
-front_dir = 1
-back_dir = 0
+front_dir = 0
+back_dir = 1
 microstep_map = {0 : (0,0,0), 1 : (1,0,0), 2 : (0,1,0), 3 :(1,1,0), 4 :(0,0,1), 5 : (0,1,1)}
 
 gas_solenoid = 37
@@ -67,9 +67,12 @@ class spraycontrol(QObject):
 		self.set_dir(0)
 		self.set_microstepping(0)
 		GPIO.output(ENABLE, 1)
-		with shelve.open('stepper_INCHperSTEP_calibration' , 'r') as shelf:
-			self.set_inches_per_step(float(shelf['inches_per_step']))		
-			self.set_track_width_steps(float(shelf['track_width_steps']))
+		with shelve.open('stepper_calibration' , 'r') as shelf:
+			try:
+				self.set_inches_per_step(float(shelf['inches_per_step']))		
+				self.set_track_width_steps(float(shelf['track_width_steps']))
+			except:
+				pass
 			
 	def pneumatic_ON(self):
 		GPIO.output(gas_solenoid, 1)
@@ -167,6 +170,10 @@ class spraycontrol(QObject):
 		self.set_microstepping(current_microstepping)
 		self.operation_done.emit(True)
 		
+		with shelve.open('stepper_calibration' , 'w') as shelf:
+			shelf['inches_per_step'] = self.__track_width_inches
+			shelf['track_width_steps'] = self.__track_width_steps
+			
 		return [self.__inches_per_step, self.__track_width_steps]
 		
 	def spray_cycle_motor(self, delay = 0.001, pause_time = 0, microstepping = 0, width = 0, mode = 0):
@@ -282,13 +289,13 @@ class spraycontrol(QObject):
 		if 0 not in self.get_endstop_state():
 			return
 		self.__go_sentinal = False
-		print("Hit Front EndSTOP")
+		print("Hit Front EndSTOP", self.__go_sentinal)
 	
 	def back_endstop(self, channel):
 		if 0 not in self.get_endstop_state():
 			return
 		self.__go_sentinal = False
-		print("Hit Back EndSTOP")
+		print("Hit Back EndSTOP", self.__go_sentinal)
 		
 	def set_microstepping(self, key):
 		GPIO.output(microstepping, microstep_map[key])

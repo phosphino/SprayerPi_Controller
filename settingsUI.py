@@ -95,7 +95,7 @@ class Ui_MotorSettings(object):
         self.microstepping_comboBox.setItemText(5, _translate("MotorSettings", "1/32"))
         self.microstepping_label.setText(_translate("MotorSettings", "Microstepping"))
         self.maxWidth_label.setText(_translate("MotorSettings", "Track Length (inches)"))
-        self.maxWidth_edit.setText(_translate("MotorSettings", "4.764"))
+        self.maxWidth_edit.setText(_translate("MotorSettings", "5.000"))
         self.testdelay_button.setText(_translate("MotorSettings", "Test"))
         self.calibrate_button.setText(_translate("MotorSettings", "Calibrate"))
 
