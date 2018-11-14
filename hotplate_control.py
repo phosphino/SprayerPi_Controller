@@ -9,7 +9,8 @@ hotplate_relay = 11
 BUS = 1
 ADDRESS = 0x50#ADDRESS OF TPL0102 DIGITAL POTENTIOMETER WITH 256 TAPS
 #THE DIGITAL POTENTIOMETER USED IS TEXAS INSTRUMENTS TPL0102 PUT IN A RHEOSTAT CONFIGURATION
-REGISTER = 0x00 #ADDRESS OF THE REGISTER WIPER 'A' ON THE TPL0102
+REG_A = 0x00 #ADDRESS OF THE REGISTER WIPER 'A' ON THE TPL0102
+REG_B = 0x01
 #USING THE RHEOSTAT FOR PID CONTROL OF THE HEATING ELEMENT BY USE OF DIMMER FUNCTION ON HOTPLATE POWER SUPPLY
 
 class thermocouplecontrol(QObject):
@@ -29,13 +30,14 @@ class thermocouplecontrol(QObject):
 class hotplatecontrol(QObject):
 	register_value = pyqtSignal(int)
 
-	def __init__(self, p = 1.0, i = 15.0, d = 2.0):
+	def __init__(self, p = 34.0, i = 2.0, d = 35):
 		QObject.__init__(self)
 		GPIO.setwarnings(False)
 		GPIO.setmode(GPIO.BOARD)
 		GPIO.setup(hotplate_relay, GPIO.OUT)
 		
 		self.bus = smbus.SMBus(BUS)
+		self.__heating_sentinal = False
 		
 		self.__kp = p
 		self.__ki = i
@@ -50,7 +52,6 @@ class hotplatecontrol(QObject):
 		self.__integrator = 0.0
 		self.__derivator = 0.0
 		
-		self.__heating_sentinal = False
 		self.write_PID(0)
 
 		
@@ -84,6 +85,7 @@ class hotplatecontrol(QObject):
 		
 	def deactivate_relay(self):
 		GPIO.output(hotplate_relay, GPIO.LOW)
+		self.__heating_sentinal = False
 		return GPIO.input(hotplate_relay)
 		
 	def query_relay(self):
@@ -102,28 +104,45 @@ class hotplatecontrol(QObject):
 	
 	@pyqtSlot(float)	
 	def calculatePID(self, current_temp):
-		if self.__heating_sentinal:
-			value = self.update(current_temp)
-			self.write_PID(value)
+		if self.__heating_sentinal == False:
+			return
+		value = self.update(current_temp)
+		self.write_PID(value)
 
 			
 	def terminate_heating(self):
-		self.__heating_sentinal = False
 		self.deactivate_relay()
 		self.write_PID(0)
 		
 	#CHANGES THE RESISTANCE PROVIDED BY THE REHOSTAT TO THE DIMMER CONTROL ON THE HEATING ELEMENT POWER SUPPLY
-	#OFF IS VAL = 0 AND MAX CURRENT IS VAL = 255	
-	#VAL = 0 IS 0 OHM AND VAL = 255 IS 100K OHM
+
 	def write_PID(self, val):
-		if val > 255:
-			val = 255
+		aval = self.bus.read_byte_data(ADDRESS, REG_A)
+		bval = self.bus.read_byte_data(ADDRESS, REG_B)
+		if val > 510:
+			val = 510
 		if val < 0:
 			val = 0
 		val = int(val)
-		self.bus.write_byte_data(ADDRESS, REGISTER, val)
+		if val <= 255:
+			if bval !=0:
+				self.bus.write_byte_data(ADDRESS, REG_B, 0)
+				return
+			else:
+				self.bus.write_byte_data(ADDRESS, REG_A, val)
+		if val > 255:
+			if aval != 255:
+				self.bus.write_byte_data(ADDRESS, REG_A, 255)
+				return
+			else:
+				bvalue = int(510 - val)
+				self.bus.write_byte_data(ADDRESS, REG_B, bvalue)
 		self.register_value.emit(val)
-		return self.bus.read_byte_data(ADDRESS, REGISTER)
+		print(val)
+		aval = self.bus.read_byte_data(ADDRESS, REG_A)
+		bval = self.bus.read_byte_data(ADDRESS, REG_B)
+		print('setpoint val: ', val, 'REGISTER A set to: ', aval, 'REGISTER B set to:', bval)
+		
 		
 	def update(self, current):
 		self.__error = self.__setpoint - current
@@ -134,10 +153,10 @@ class hotplatecontrol(QObject):
 		self.__derivator = self.__error
 		
 		self.__integrator = self.__integrator + self.__error
-		if self.__integrator > 500:
-			self.__integrator = 500
-		elif self.__integrator < -500:
-			self.__integrator = -500
+		if self.__integrator > 50:
+			self.__integrator = 50
+		elif self.__integrator < -50:
+			self.__integrator = -50
 			
 		self.__ivalue = self.__ki*self.__integrator
 		

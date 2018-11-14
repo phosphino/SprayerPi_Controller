@@ -10,6 +10,7 @@ from collections import OrderedDict
 import csv
 import numpy as np
 from hotplate_control import thermocouplecontrol, hotplatecontrol
+from PyQt5.QtCore import pyqtSlot, QObject
 from spray_control import spraycontrol
 from pyqtTemp import *
 import time 
@@ -17,9 +18,10 @@ import pyqtgraph as pg
 
 pg.setConfigOption('foreground', 'y')
 #pg.setConfigOption('background', 'b')
-class mainwindow(Ui_MainWindow):
+class mainwindow(Ui_MainWindow, QObject):
 	def __init__(self, mainwindow):
 		Ui_MainWindow.__init__(self)
+		QObject.__init__(self)
 		self.setupUi(mainwindow)
 		
 		self.__spraysettingsDict = OrderedDict()
@@ -28,6 +30,7 @@ class mainwindow(Ui_MainWindow):
 		self.__plotlock = False
 		self.__syringe_params = {}
 		self.__spray_params = {}
+		self.__heating_sentinal = False
 				
 		self.settings_dialog = QtWidgets.QDialog()
 		self.dialog = Ui_MotorSettings()
@@ -68,6 +71,9 @@ class mainwindow(Ui_MainWindow):
 		
 		self.clearPlot_button.clicked.connect(self.clear_plot)
 		self.hotplate_toggle.clicked.connect(self.toggle_heating)
+		self.newSetpoint_button.clicked.connect(self.go_to_setpoint)
+		
+		self.hotplate.register_value.connect(self.updateHeating_power)
 		
 		self.thermocouple.temperature_data.connect(self.updateTemperature)
 		self.thermocouple.temperature_data.connect(self.hotplate.calculatePID)
@@ -97,6 +103,22 @@ class mainwindow(Ui_MainWindow):
 		self.__plotlock = True
 		self.spraycontrol.set_operationMode(3)
 		self.spray_QThread.start()
+	
+	def go_to_setpoint(self):
+		if self.__heating_sentinal == False:
+			self.user_settings_error('Hotplate Disabled')
+		else:
+			setpoint = self.setPoint_edit.text()
+			try:
+				setpoint = float(setpoint)
+			except:
+				self.user_settings_error('Enter numeric temperature setpoint')
+				return
+			if setpoint < 0:
+				self.user_settings_error('Setpoint must be a positive number')
+				return
+			
+			self.hotplate.setPoint_start(setpoint)			
 		
 	def calibrateTrack(self):
 		if self.spray_QThread.isRunning():
@@ -333,23 +355,19 @@ class mainwindow(Ui_MainWindow):
 				
 	def toggle_heating(self):
 		print(self.hotplate.query_relay())
-		if self.hotplate.query_relay()==1:
-			print('turning off')
+		if self.hotplate.query_relay()==1:			
 			self.hotplate.terminate_heating()
-			self.hotplate_toggle.setText("Hotplate ON")
+			self.hotplate_toggle.setText("Activate Hotplate")
+			self.__heating_sentinal = False
 			return
+		else:	
+			self.hotplate_toggle.setText("Disable Hotplate")
+			self.__heating_sentinal = True
 			
-		try:
-			setpoint = float(self.__spraysettingsDict[self.setPoint_label].text())
-		except:
-			self.user_settings_error('Temperature Setpoint Invalid')
-			return
-		print('turning on')
-		self.hotplate.setPoint_start(setpoint)
-		self.hotplate_toggle.setText("Hotplate OFF")
-		
+	@pyqtSlot(int)
 	def updateHeating_power(self, register_value):
-		percentage = 100.0*(float(register_value) / 255.0)
+		print(register_value)
+		percentage = 100.0*(float(register_value) / 510.0)
 		self.hotplatePercent_label.setText('{0:.1f} %'.format(percentage))
 		
 		

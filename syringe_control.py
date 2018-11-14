@@ -56,7 +56,7 @@ class syringecontrol(serial.Serial):
 		self.set_diameter(syringe_diameter)
 		self.write_command('VOLML') #set syringe volume units to mL.
 		#unit conversion occurs software side
-		self.loc_keypad(True)
+		self.loc_keypad(False)
 		self.__run_state = False
 		
 	def write_command(self, command):
@@ -179,28 +179,17 @@ class syringecontrol(serial.Serial):
 	def run_pump(self):
 		command = 'RUN'
 		response = self.write_command(command)
-		if '?' in response:
-			raise Exception('run_pump')
-		self.__run_state = True
 		return response
 	
 	def stop_pump(self):
 		command = 'STP'
 		response = self.write_command(command)
-		if '?' in response:
-			raise Exception('stop_pump')
-		self.__run_state = False
 		return response
 		
 	def purge_pump(self):
 		command = 'PUR'
 		response = self.write_command(command)
-		if '?' in response:
-			raise Exception('purge_pump')
 		return response
-		
-	def get_run_state(self):
-		return self.__run_state
 	
 	def return_rsp(self):
 		return self.__rsp

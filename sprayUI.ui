@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1344</width>
+    <width>1346</width>
     <height>735</height>
    </rect>
   </property>
@@ -96,20 +96,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="hotplateStatus_label">
-        <property name="font">
-         <font>
-          <family>PibotoLt</family>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="text">
-         <string>HOTPLATE OFF</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="hotplatePercent_label">
         <property name="font">
          <font>
@@ -118,14 +104,14 @@
          </font>
         </property>
         <property name="text">
-         <string>(0%)</string>
+         <string>(OFF)</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="hotplate_toggle">
         <property name="text">
-         <string>Hotplate ON</string>
+         <string>Activate Hotplate</string>
         </property>
        </widget>
       </item>
@@ -549,8 +535,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1344</width>
-     <height>26</height>
+     <width>1346</width>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

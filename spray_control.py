@@ -71,6 +71,8 @@ class spraycontrol(QObject):
 			try:
 				self.set_inches_per_step(float(shelf['inches_per_step']))		
 				self.set_track_width_steps(float(shelf['track_width_steps']))
+				print('saving to shelf', shelf['inches_per_step'])
+				print('saving to shelf', shelf['track_width_steps'])
 			except:
 				pass
 			
@@ -173,10 +175,13 @@ class spraycontrol(QObject):
 		with shelve.open('stepper_calibration' , 'w') as shelf:
 			shelf['inches_per_step'] = self.__track_width_inches
 			shelf['track_width_steps'] = self.__track_width_steps
+			print('saving to shelf ', shelf['inches_per_step'])
+			print('saving to shelf', shelf['track_width_steps'])
 			
 		return [self.__inches_per_step, self.__track_width_steps]
 		
 	def spray_cycle_motor(self, delay = 0.001, pause_time = 0, microstepping = 0, width = 0, mode = 0):
+		self.syringePump.clear_volume_dispensed()
 		self.set_delay(self.__travel_delay)
 		self.set_microstepping(self.__travel_microstepping)
 		if 0 not in self.get_endstop_state():
@@ -202,17 +207,15 @@ class spraycontrol(QObject):
 		self.set_delay(delay)
 		self.set_microstepping(microstepping)
 		factor = 2**self.get_microstepping()
-		print(factor)
 		spray_width_steps = spray_width_steps * factor			
 		self.reverse_dir()
 		target_dispense_volume = float(self.syringePump.get_dispense_volume()[0])
 		volume_dispensed = 0.0
-		self.syringePump.clear_volume_dispensed()
+
 		while volume_dispensed < target_dispense_volume:
 			print('volume dispensed: ', volume_dispensed)
 			self.pneumatic_ON()
-			if self.syringePump.get_run_state() == False:
-				self.syringePump.run_pump()			
+			self.syringePump.run_pump()		
 			for i in range(spray_width_steps):
 				if self.__go_sentinal == False:
 					break
